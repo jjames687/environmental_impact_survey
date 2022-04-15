@@ -170,7 +170,6 @@ class Survey(Tk):
         positionDown = int(Tk.winfo_screenheight(self) / 2 - windowHeight / 2)
         Tk.geometry(self, newGeometry="{}x{}+{}+{}".format(
             windowWidth, windowHeight, positionRight, positionDown))
-        Tk.maxsize(self, windowWidth, windowHeight)
 
         # Create container Frame to hold all other classes, 
         # which are the different parts of the survey.
@@ -274,7 +273,6 @@ class Construccion(Frame):
         self.controller = controller
 
         global actions_impacts
-
         # Create header label
         ttk.Label(self, text="Construccion campamento y oficinas", font=('Verdana', 20),
                   borderwidth=2, relief="ridge").pack(padx=10, pady=10)
@@ -315,6 +313,33 @@ class Construccion(Frame):
         self.question_label = Label(self, text="{}. {}".format(self.index + 1, self.questions[self.index]),
                                     font=('Verdana', 16))
         self.question_label.pack(padx=20, pady=10)
+
+        Label(self, text="Impact", font=('Verdana', 10)).pack(padx=50)
+
+        # Not at all, somewhat, average, agree, strongly agree
+        scale_text = ["Negative", "No Impact", "Positive"]
+
+        scale = [("-1", -1), ("0", 0), ("1", 1)]
+
+        self.impact = StringVar()
+        self.impact.set(0)  # initialize
+
+        # Frame to contain text
+        checkbox_scale_frame = Frame(self, borderwidth=2, relief="ridge")
+        checkbox_scale_frame.pack(pady=2)
+
+        for text in scale_text:
+            b = ttk.Label(checkbox_scale_frame, text=text)
+            b.pack(side='left', ipadx=7, ipady=5)
+
+        # Frame to contain checkboxes
+        checkbox_frame = Frame(self, borderwidth=2, relief="ridge")
+        checkbox_frame.pack(pady=10, anchor='center')
+
+        for text, value in scale:
+            b = ttk.Radiobutton(checkbox_frame, text=text,
+                                variable=self.impact, value=value)
+            b.pack(side='left', ipadx=17, ipady=2)
 
         Label(self, text="Intensidad", font=('Verdana', 10)).pack(padx=50)
 
@@ -391,11 +416,11 @@ class Construccion(Frame):
                       "You did not select an answer.\nPlease try again.")
         elif self.index == (self.length_of_list - 1):
             # get the last answer from user
-            variables = dict()
-            variables['intensidad'] = self.intensidad.get()
-            variables["extension"] = self.extension.get()
+            total_impact = 0
+            total_impact = 3*(int(self.intensidad.get())) + 2*(int(self.extension.get()))
+            total_impact = int(self.impact.get())*total_impact
             variable = self.index
-            self.construccion[variable] = variables
+            self.construccion[variable] = total_impact
             actions_impacts[Construccion] = self.construccion
             print(self.construccion)
             print(actions_impacts)
@@ -406,12 +431,13 @@ class Construccion(Frame):
             self.index = (self.index + 1) % self.length_of_list
 
             self.question_label.config(text="{}. {}".format(self.index + 1, self.questions[self.index]))
-            variables = dict()
-            variables['intensidad'] = self.intensidad.get()
-            variables["extension"] = self.extension.get()
+            total_impact = 0
+            total_impact = 3*(int(self.intensidad.get())) + 2*(int(self.extension.get()))
+            total_impact = int(self.impact.get())*total_impact
             variable = self.index
-            self.construccion[variable] = variables
+            self.construccion[variable] = total_impact
 
+            self.impact.set(0)
             self.extension.set(0)  # reset value for next question
             self.intensidad.set(0)  # reset value for next question
 
