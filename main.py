@@ -6,6 +6,7 @@ Date: 2019.11.17
 
 Trying to make a survey that can do environmental impoct surveys
 """
+import tkinter
 from tkinter import (Tk, Label, Button, Radiobutton, Frame, Menu,
                      messagebox, StringVar, Listbox, BROWSE, END, Toplevel, Entry)
 from tkinter import ttk
@@ -160,7 +161,8 @@ class Survey(Tk):
         # if user if they want to quit or not.
         self.protocol("WM_DELETE_WINDOW", self.on_closing)
 
-        Tk.wm_title(self, "Survey (中文版)")
+        # title for the whole survey
+        Tk.wm_title(self, "Environmental Impact Survey")
 
         # get position of window with respect to screen
         windowWidth, windowHeight = 555, 400
@@ -188,7 +190,7 @@ class Survey(Tk):
         # create empty dictionary for the different frames (the different classes)
         self.frames = {}
 
-        for fr in (StartPage, LifeStyleSurveyPages, SignificantConsumptionTrendsSurveyPages,
+        for fr in (StartPage, Construccion, SignificantConsumptionTrendsSurveyPages,
                    FutureConsumptionTrendsSurveyPages, GenderQuestion,
                    MarriageQuestion, AgeQuestion, WorkQuestion, EdBackgroundQuestion,
                    SalaryQuestion, RelationQuestion, TimeQuestion, TransitQuestion,
@@ -228,23 +230,26 @@ class StartPage(Frame):
 
         # set up start page window
         self.configure(bg="#EFF3F6")
-        start_label = Label(self, text="Survey", font=("Verdana", 16),
+        start_label = Label(self, text="Environmental Impact", font=("Verdana", 16),
                             borderwidth=2, relief="ridge")
         start_label.pack(pady=10, padx=10, ipadx=5, ipady=3)
 
         # add labels and buttons to window
-        info_text = "Thank you for participating in our survey.\nThe survey is composed of 4 four parts:\nLifestyle: 25 questions\nConsumption Trends: 16 questions\nFuture Consumption Trends: 5 questions\nGeneral Information: 10 questions\n\nAfter each section, a small window will notify you."
+        info_text = "Using this tool to complete the survey:\nFor each action in the plan, you will decide if it has" \
+                    " an impact.\nThen you will decide if the impact is positive or negative.\nFinally, the assesment" \
+                    "of the impact will be completed.\nThere are 3 phases of action in the plan.\nThere are 12 total" \
+                    " actions to assess for 26 impacts.\n\nAfter each section, a small window will notify you."
         info_label = Label(self, text=info_text, font=("Verdana", 12),
                            borderwidth=2, relief="ridge")
         info_label.pack(pady=10, padx=10, ipadx=20, ipady=3)
 
-        purpose_text = "Explain here the purpose of the survey."
+        purpose_text = "The purpose of this questionaire is to make it \nto fill out impact surveys."
         purpose_text = Label(self, text=purpose_text, font=("Verdana", 12),
                              borderwidth=2, relief="ridge")
         purpose_text.pack(pady=10, padx=10, ipadx=5, ipady=3)
 
         start_button = ttk.Button(self, text="Begin Survey",
-                                  command=lambda: controller.show_frame(LifeStyleSurveyPages))
+                                  command=lambda: controller.show_frame(Construccion))
         start_button.pack(ipadx=10, ipady=15, pady=15)
 
         quit_button = ttk.Button(self, text="Quit", command=self.on_closing)
@@ -258,10 +263,10 @@ class StartPage(Frame):
             self.controller.destroy()
 
 
-class LifeStyleSurveyPages(Frame):
+class Construccion(Frame):
     """
-    Class that displays the window for the life style survey questions. 
-    When the user answers a question, the answer saved to a list.  
+    Class that displays questions for Fase 1
+    Construccion campamento y oficinas
     """
 
     def __init__(self, master, controller):
@@ -271,22 +276,36 @@ class LifeStyleSurveyPages(Frame):
         global lifestyle_list
 
         # Create header label
-        ttk.Label(self, text="生活方式", font=('Verdana', 20),
+        ttk.Label(self, text="Construccion campamento y oficinas", font=('Verdana', 20),
                   borderwidth=2, relief="ridge").pack(padx=10, pady=10)
 
-        self.questions = ["我比较快地接受流行。", "我对有关流行的文章和故事感兴趣。",
-                          "我通常买时尚的衣服。", "我觉得时尚是表现自己的重要手段。",
-                          "商品要贴上外国牌子才显得酷。", "众所周知的商标更让人信赖。",
-                          "即使是昂贵的外国商品,只要想要就购买。", "我在集团上总是想当领导。",
-                          "我想成为后世留下足迹的名人。", "相信自己的潜质比其他人优秀。",
-                          "我满足于现在的生活。", "我感觉自己没有被其他朋友疏远。",
-                          "我觉得自己做事情都比较顺利。", "我觉得我自己可以真正感到幸福。",
-                          "我想珍惜至今的习俗。", "我觉得我们国家的传统是应该遵守的。",
-                          "买东西时往往从周围的人得到信息。", "为购买廉价商品,在多家商店进行比较价格。",
-                          "从广告中获取的信息,在我买东西时会有所帮助。", "我买食品时受广告影响很大。",
-                          "众所周知的商标更让人信赖。", "商品要贴上外国牌子才显得酷。",
-                          "同样的价格,外国产品比国产好。", "买东西时往往从周围的人得到信息。",
-                          "为购买廉价商品,在多家商店进行比较价格。"]
+        self.questions = ["Cambio en caracteristicas fisicoquimicas \ndel agua",
+                          "Alteracion y contaminacion de drenajes \nnaturales",
+                          "Afectacion de acuiferos",
+                          "Alteracion de dinamicas entre aguas \nsuperficiales y subterraneas",
+                          "Cambio en caracteristicas fisicoquimicas \ndel agua",
+                          "Contaminacion drenajes",
+                          "Emisiones de gases contaminantes",
+                          "Emision de material particulado",
+                          "Cambio en niveles de ruido",
+                          "Cambio en propiedades fisicas del suelo",
+                          "Cambio en propiedades quimicas",
+                          "Cambio en estabilidad",
+                          "Cambio en erodabilidad",
+                          "Cambio en relieve y pendientes",
+                          "Cambio en areas de inundacion",
+                          "Cambio en el paisaje",
+                          "Disrupcion de ecosistemas acuaticos",
+                          "Alteracion de la abundancia de especies \nvegetales en el area del proyecto",
+                          "Alteración en la estructura, composición, \nfragmentación y/o modificación de habitats \n"
+                          "y  cobertura vegetal",
+                          "Ahuyento de especies silvestres",
+                          "Cambios en comportamientos, jerarquias \ny percepciones sociales",
+                          "Cambio en niveles y tipos de riesgos",
+                          "Cambio en demanda de servicios de salud",
+                          "Cambio en fuentes de ingreso",
+                          "Cambios en oferta y demanda de diferentes\n bienes y ervicios",
+                          "Cambio en trafico vehicular y transito \npeatonal", ]
 
         # set index in questions list 
         self.index = 0
@@ -295,18 +314,48 @@ class LifeStyleSurveyPages(Frame):
         # Set up labels and checkboxes 
         self.question_label = Label(self, text="{}. {}".format(self.index + 1, self.questions[self.index]),
                                     font=('Verdana', 16))
-        self.question_label.pack(anchor='w', padx=20, pady=10)
-        Label(self, text="选择最适合您的答案。", font=('Verdana', 10)).pack(padx=50)
+        self.question_label.pack(padx=20, pady=10)
+
+        Label(self, text="Intensidad", font=('Verdana', 10)).pack(padx=50)
 
         # Not at all, somewhat, average, agree, strongly agree
-        scale_text = ["不同意", "不太同意", "基本同意", "非常同意", "完全同意"]
+        scale_text = ["Baja", "Media", "Alta", "Muy Alta", "Total"]
 
-        scale = [("1", 1), ("2", 2), ("3", 3), ("4", 4), ("5", 5)]
+        scale = [("1", 1), ("2", 2), ("4", 4), ("8", 8), ("12", 12)]
 
         self.var = StringVar()
         self.var.set(0)  # initialize
 
         # Frame to contain text 
+        checkbox_scale_frame = Frame(self, borderwidth=2, relief="ridge")
+        checkbox_scale_frame.pack(pady=2)
+
+        for text in scale_text:
+            b = ttk.Label(checkbox_scale_frame, text=text)
+            b.pack(side='left', ipadx=7, ipady=5)
+
+        # Frame to contain checkboxes
+        checkbox_frame = Frame(self, borderwidth=2, relief="ridge")
+        checkbox_frame.pack(pady=10, anchor='center')
+
+        for text, value in scale:
+            b = ttk.Radiobutton(checkbox_frame, text=text,
+                                variable=self.var, value=value)
+            b.pack(side='left', ipadx=17, ipady=2)
+
+        # Set up labels and checkboxes
+        self.question_label.pack(anchor='w', padx=20, pady=10)
+        Label(self, text="Extension", font=('Verdana', 10)).pack(padx=50)
+
+        # Not at all, somewhat, average, agree, strongly agree
+        scale_text = ["Baja", "Media", "Alta", "Muy Alta", "Total"]
+
+        scale = [("1", 1), ("2", 2), ("4", 4), ("8", 8), ("12", 12)]
+
+        self.var = StringVar()
+        self.var.set(0)  # initialize
+
+        # Frame to contain text
         checkbox_scale_frame = Frame(self, borderwidth=2, relief="ridge")
         checkbox_scale_frame.pack(pady=2)
 
