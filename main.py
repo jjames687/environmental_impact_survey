@@ -17,7 +17,7 @@ import csv
 import os.path
 
 # create empty lists used for each set of questions
-lifestyle_list = []
+actions_impacts = dict()
 sig_trends_list = []
 future_trends_list = []
 general_answers_list = []
@@ -268,12 +268,12 @@ class Construccion(Frame):
     Class that displays questions for Fase 1
     Construccion campamento y oficinas
     """
-
+    construccion = dict()
     def __init__(self, master, controller):
         Frame.__init__(self, master)
         self.controller = controller
 
-        global lifestyle_list
+        global actions_impacts
 
         # Create header label
         ttk.Label(self, text="Construccion campamento y oficinas", font=('Verdana', 20),
@@ -323,8 +323,8 @@ class Construccion(Frame):
 
         scale = [("1", 1), ("2", 2), ("4", 4), ("8", 8), ("12", 12)]
 
-        self.var = StringVar()
-        self.var.set(0)  # initialize
+        self.intensidad = StringVar()
+        self.intensidad.set(0)  # initialize
 
         # Frame to contain text 
         checkbox_scale_frame = Frame(self, borderwidth=2, relief="ridge")
@@ -340,7 +340,7 @@ class Construccion(Frame):
 
         for text, value in scale:
             b = ttk.Radiobutton(checkbox_frame, text=text,
-                                variable=self.var, value=value)
+                                variable=self.intensidad, value=value)
             b.pack(side='left', ipadx=17, ipady=2)
 
         # Set up labels and checkboxes
@@ -352,8 +352,8 @@ class Construccion(Frame):
 
         scale = [("1", 1), ("2", 2), ("4", 4), ("8", 8), ("12", 12)]
 
-        self.var = StringVar()
-        self.var.set(0)  # initialize
+        self.extension = StringVar()
+        self.extension.set(0)  # initialize
 
         # Frame to contain text
         checkbox_scale_frame = Frame(self, borderwidth=2, relief="ridge")
@@ -369,7 +369,7 @@ class Construccion(Frame):
 
         for text, value in scale:
             b = ttk.Radiobutton(checkbox_frame, text=text,
-                                variable=self.var, value=value)
+                                variable=self.extension, value=value)
             b.pack(side='left', ipadx=17, ipady=2)
 
         # Create next question button
@@ -381,16 +381,24 @@ class Construccion(Frame):
         When button is clicked, add user's input to a list
         and display next question.
         '''
-        answer = self.var.get()
-
-        if answer == '0':
-            dialogBox("No Value Given",
+        answer1 = self.intensidad.get()
+        answer2 = self.extension.get()
+        if answer1 == '0':
+            dialogBox("No Value Given: Intensidad",
+                      "You did not select an answer.\nPlease try again.")
+        elif answer2 == '0':
+            dialogBox("No Value Given: Extension",
                       "You did not select an answer.\nPlease try again.")
         elif self.index == (self.length_of_list - 1):
             # get the last answer from user
-            selected_answer = self.var.get()
-            lifestyle_list.append(selected_answer)
-
+            variables = dict()
+            variables['intensidad'] = self.intensidad.get()
+            variables["extension"] = self.extension.get()
+            variable = self.index
+            self.construccion[variable] = variables
+            actions_impacts[Construccion] = self.construccion
+            print(self.construccion)
+            print(actions_impacts)
             next_survey_text = "End of Part 1."
             nextSurveyDialog("Next Survey", next_survey_text,
                              lambda: self.controller.show_frame(SignificantConsumptionTrendsSurveyPages))
@@ -398,10 +406,14 @@ class Construccion(Frame):
             self.index = (self.index + 1) % self.length_of_list
 
             self.question_label.config(text="{}. {}".format(self.index + 1, self.questions[self.index]))
-            selected_answer = self.var.get()
-            lifestyle_list.append(selected_answer)
+            variables = dict()
+            variables['intensidad'] = self.intensidad.get()
+            variables["extension"] = self.extension.get()
+            variable = self.index
+            self.construccion[variable] = variables
 
-            self.var.set(0)  # reset value for next question
+            self.extension.set(0)  # reset value for next question
+            self.intensidad.set(0)  # reset value for next question
 
             time.sleep(.2)  # delay between questions
 
