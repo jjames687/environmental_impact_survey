@@ -6,21 +6,17 @@ Date: 2019.11.17
 
 Trying to make a survey that can do environmental impoct surveys
 """
-import tkinter
-from tkinter import (Tk, Label, Button, Radiobutton, Frame, Menu,
-                     messagebox, StringVar, Listbox, BROWSE, END, Toplevel, Entry)
-from tkinter import ttk
-from tkinter import messagebox
-import pathlib
-import time
 import csv
 import os.path
+import time
+from tkinter import (Tk, Label, Button, Frame, Menu,
+                     StringVar, Toplevel, Entry)
+from tkinter import messagebox
+from tkinter import ttk
 
 # create empty lists used for each set of questions
 actions_impacts = dict()
-sig_trends_list = []
-future_trends_list = []
-general_answers_list = []
+questions = ["Abiotico", "Biotico", "Socioeconomico"]
 
 
 def dialogBox(title, message):
@@ -164,13 +160,6 @@ class Survey(Tk):
         # title for the whole survey
         Tk.wm_title(self, "Environmental Impact Survey")
 
-        # get position of window with respect to screen
-        windowWidth, windowHeight = 555, 400
-        positionRight = int(Tk.winfo_screenwidth(self) / 2 - windowWidth / 2)
-        positionDown = int(Tk.winfo_screenheight(self) / 2 - windowHeight / 2)
-        Tk.geometry(self, newGeometry="{}x{}+{}+{}".format(
-            windowWidth, windowHeight, positionRight, positionDown))
-
         # Create container Frame to hold all other classes, 
         # which are the different parts of the survey.
         container = Frame(self)
@@ -189,11 +178,8 @@ class Survey(Tk):
         # create empty dictionary for the different frames (the different classes)
         self.frames = {}
 
-        for fr in (StartPage, Construccion, SignificantConsumptionTrendsSurveyPages,
-                   FutureConsumptionTrendsSurveyPages, GenderQuestion,
-                   MarriageQuestion, AgeQuestion, WorkQuestion, EdBackgroundQuestion,
-                   SalaryQuestion, RelationQuestion, TimeQuestion, TransitQuestion,
-                   ExpensesQuestion):
+        for fr in (StartPage, Construccion, Apertura, Adecuacion, Descapote, Vias_transporte, Disposicion, Arranque,
+                   Cargue, Ventilacion, Drenajes, Esteriles_escombros, Cierre, Levantamiento, EndScreen):
             frame = fr(container, self)
             self.frames[fr] = frame
             frame.grid(row=0, column=0, sticky="nsew")
@@ -273,37 +259,12 @@ class Construccion(Frame):
         self.controller = controller
 
         global actions_impacts
+        global questions
         # Create header label
         ttk.Label(self, text="Construccion campamento y oficinas", font=('Verdana', 20),
                   borderwidth=2, relief="ridge").pack(padx=10, pady=10)
 
-        self.questions = ["Cambio en caracteristicas fisicoquimicas \ndel agua",
-                          "Alteracion y contaminacion de drenajes \nnaturales",
-                          "Afectacion de acuiferos",
-                          "Alteracion de dinamicas entre aguas \nsuperficiales y subterraneas",
-                          "Cambio en caracteristicas fisicoquimicas \ndel agua",
-                          "Contaminacion drenajes",
-                          "Emisiones de gases contaminantes",
-                          "Emision de material particulado",
-                          "Cambio en niveles de ruido",
-                          "Cambio en propiedades fisicas del suelo",
-                          "Cambio en propiedades quimicas",
-                          "Cambio en estabilidad",
-                          "Cambio en erodabilidad",
-                          "Cambio en relieve y pendientes",
-                          "Cambio en areas de inundacion",
-                          "Cambio en el paisaje",
-                          "Disrupcion de ecosistemas acuaticos",
-                          "Alteracion de la abundancia de especies \nvegetales en el area del proyecto",
-                          "Alteración en la estructura, composición, \nfragmentación y/o modificación de habitats \n"
-                          "y  cobertura vegetal",
-                          "Ahuyento de especies silvestres",
-                          "Cambios en comportamientos, jerarquias \ny percepciones sociales",
-                          "Cambio en niveles y tipos de riesgos",
-                          "Cambio en demanda de servicios de salud",
-                          "Cambio en fuentes de ingreso",
-                          "Cambios en oferta y demanda de diferentes\n bienes y ervicios",
-                          "Cambio en trafico vehicular y transito \npeatonal", ]
+        self.questions = questions
 
         # set index in questions list 
         self.index = 0
@@ -406,12 +367,13 @@ class Construccion(Frame):
         When button is clicked, add user's input to a list
         and display next question.
         '''
+        answer0 = self.impact.get()
         answer1 = self.intensidad.get()
         answer2 = self.extension.get()
-        if answer1 == '0':
+        if answer0 != '0' and answer1 == '0':
             dialogBox("No Value Given: Intensidad",
                       "You did not select an answer.\nPlease try again.")
-        elif answer2 == '0':
+        elif answer0 != '0' and answer2 == '0':
             dialogBox("No Value Given: Extension",
                       "You did not select an answer.\nPlease try again.")
         elif self.index == (self.length_of_list - 1):
@@ -426,7 +388,7 @@ class Construccion(Frame):
             print(actions_impacts)
             next_survey_text = "End of Part 1."
             nextSurveyDialog("Next Survey", next_survey_text,
-                             lambda: self.controller.show_frame(SignificantConsumptionTrendsSurveyPages))
+                             lambda: self.controller.show_frame(Apertura))
         else:
             self.index = (self.index + 1) % self.length_of_list
 
@@ -444,51 +406,44 @@ class Construccion(Frame):
             time.sleep(.2)  # delay between questions
 
 
-class SignificantConsumptionTrendsSurveyPages(Frame):
+class Apertura(Frame):
     """
-    Class that displays the window for the significant consumption trends survey questions. 
-    When the user answers a question, the answer is written to a 
-    csv file. 
+    Class that displays questions for Fase 1
+    Apertura Bocaminas
     """
-
+    apertura = dict()
     def __init__(self, master, controller):
         Frame.__init__(self, master)
         self.controller = controller
 
-        global sig_trends_list
-
+        global actions_impacts
+        global questions
         # Create header label
-        ttk.Label(self, text="象征性消费趋势", font=('Verdana', 20),
+        ttk.Label(self, text="Apertura y perforación bocaminas", font=('Verdana', 20),
                   borderwidth=2, relief="ridge").pack(padx=10, pady=10)
 
-        self.questions = ["通过消费可以造就出和别人不一样的自我。", "消费是塑造我形象的手段。",
-                          "消费表示我是一个什么样的人。", "消费可以让我成为珍贵的存在。",
-                          "通过消费塑造自信的形象。", "通过消费可以开发我的另一种形象。",
-                          "为了创造更好的自我形象而进行消费。", "消费是发展我自己的重要手段。",
-                          "消费成为推测其地位的标准。", "拥有品可以推测出那个人的社会背景。",
-                          "通过消费来展示我的优点。", "通过消费来表现价值观。",
-                          "通过消费传达我的形象。", "我比较喜欢流行的产品。",
-                          "想做与我想属于的集团相似的消费。", "对周围人拥有的产品或品牌比较敏感。"]
+        self.questions = questions
 
-        # set index in questions list 
+        # set index in questions list
         self.index = 0
         self.length_of_list = len(self.questions)
 
-        # Set up labels and checkboxes 
+        # Set up labels and checkboxes
         self.question_label = Label(self, text="{}. {}".format(self.index + 1, self.questions[self.index]),
                                     font=('Verdana', 16))
-        self.question_label.pack(anchor='w', padx=20, pady=10)
-        Label(self, text="选择最适合您的答案。", font=('Verdana', 10)).pack(padx=50)
+        self.question_label.pack(padx=20, pady=10)
+
+        Label(self, text="Impact", font=('Verdana', 10)).pack(padx=50)
 
         # Not at all, somewhat, average, agree, strongly agree
-        scale_text = ["不同意", "不太同意", "基本同意", "非常同意", "完全同意"]
+        scale_text = ["Negative", "No Impact", "Positive"]
 
-        scale = [("1", 1), ("2", 2), ("3", 3), ("4", 4), ("5", 5)]
+        scale = [("-1", -1), ("0", 0), ("1", 1)]
 
-        self.var = StringVar()
-        self.var.set(0)  # initialize
+        self.impact = StringVar()
+        self.impact.set(0)  # initialize
 
-        # Frame to contain text 
+        # Frame to contain text
         checkbox_scale_frame = Frame(self, borderwidth=2, relief="ridge")
         checkbox_scale_frame.pack(pady=2)
 
@@ -502,9 +457,66 @@ class SignificantConsumptionTrendsSurveyPages(Frame):
 
         for text, value in scale:
             b = ttk.Radiobutton(checkbox_frame, text=text,
-                                variable=self.var, value=value)
+                                variable=self.impact, value=value)
             b.pack(side='left', ipadx=17, ipady=2)
 
+        Label(self, text="Intensidad", font=('Verdana', 10)).pack(padx=50)
+
+        # Not at all, somewhat, average, agree, strongly agree
+        scale_text = ["Baja", "Media", "Alta", "Muy Alta", "Total"]
+
+        scale = [("1", 1), ("2", 2), ("4", 4), ("8", 8), ("12", 12)]
+
+        self.intensidad = StringVar()
+        self.intensidad.set(0)  # initialize
+
+        # Frame to contain text
+        checkbox_scale_frame = Frame(self, borderwidth=2, relief="ridge")
+        checkbox_scale_frame.pack(pady=2)
+
+        for text in scale_text:
+            b = ttk.Label(checkbox_scale_frame, text=text)
+            b.pack(side='left', ipadx=7, ipady=5)
+
+        # Frame to contain checkboxes
+        checkbox_frame = Frame(self, borderwidth=2, relief="ridge")
+        checkbox_frame.pack(pady=10, anchor='center')
+
+        for text, value in scale:
+            b = ttk.Radiobutton(checkbox_frame, text=text,
+                                variable=self.intensidad, value=value)
+            b.pack(side='left', ipadx=17, ipady=2)
+
+        # Set up labels and checkboxes
+        self.question_label.pack(anchor='w', padx=20, pady=10)
+        Label(self, text="Extension", font=('Verdana', 10)).pack(padx=50)
+
+        # Not at all, somewhat, average, agree, strongly agree
+        scale_text = ["Baja", "Media", "Alta", "Muy Alta", "Total"]
+
+        scale = [("1", 1), ("2", 2), ("4", 4), ("8", 8), ("12", 12)]
+
+        self.extension = StringVar()
+        self.extension.set(0)  # initialize
+
+        # Frame to contain text
+        checkbox_scale_frame = Frame(self, borderwidth=2, relief="ridge")
+        checkbox_scale_frame.pack(pady=2)
+
+        for text in scale_text:
+            b = ttk.Label(checkbox_scale_frame, text=text)
+            b.pack(side='left', ipadx=7, ipady=5)
+
+        # Frame to contain checkboxes
+        checkbox_frame = Frame(self, borderwidth=2, relief="ridge")
+        checkbox_frame.pack(pady=10, anchor='center')
+
+        for text, value in scale:
+            b = ttk.Radiobutton(checkbox_frame, text=text,
+                                variable=self.extension, value=value)
+            b.pack(side='left', ipadx=17, ipady=2)
+
+        # Create next question button
         enter_button = ttk.Button(self, text="Next Question", command=self.nextQuestion)
         enter_button.pack(ipady=5, pady=20)
 
@@ -513,71 +525,83 @@ class SignificantConsumptionTrendsSurveyPages(Frame):
         When button is clicked, add user's input to a list
         and display next question.
         '''
-        answer = self.var.get()
-
-        if answer == '0':
-            dialogBox("No Value Given",
+        answer0 = self.impact.get()
+        answer1 = self.intensidad.get()
+        answer2 = self.extension.get()
+        if answer0 != '0' and answer1 == '0':
+            dialogBox("No Value Given: Intensidad",
+                      "You did not select an answer.\nPlease try again.")
+        elif answer0 != '0' and answer2 == '0':
+            dialogBox("No Value Given: Extension",
                       "You did not select an answer.\nPlease try again.")
         elif self.index == (self.length_of_list - 1):
             # get the last answer from user
-            selected_answer = self.var.get()
-            sig_trends_list.append(selected_answer)
-
+            total_impact = 0
+            total_impact = 3*(int(self.intensidad.get())) + 2*(int(self.extension.get()))
+            total_impact = int(self.impact.get())*total_impact
+            variable = self.index
+            self.apertura[variable] = total_impact
+            actions_impacts[Apertura] = self.apertura
+            print(self.apertura)
+            print(actions_impacts)
             next_survey_text = "End of Part 2."
             nextSurveyDialog("Next Survey", next_survey_text,
-                             lambda: self.controller.show_frame(FutureConsumptionTrendsSurveyPages))
+                             lambda: self.controller.show_frame(Adecuacion))
         else:
             self.index = (self.index + 1) % self.length_of_list
 
             self.question_label.config(text="{}. {}".format(self.index + 1, self.questions[self.index]))
-            selected_answer = self.var.get()
-            sig_trends_list.append(selected_answer)
+            total_impact = 0
+            total_impact = 3*(int(self.intensidad.get())) + 2*(int(self.extension.get()))
+            total_impact = int(self.impact.get())*total_impact
+            variable = self.index
+            self.apertura[variable] = total_impact
 
-            self.var.set(0)  # reset value for next question
+            self.impact.set(0)
+            self.extension.set(0)  # reset value for next question
+            self.intensidad.set(0)  # reset value for next question
 
             time.sleep(.2)  # delay between questions
 
 
-class FutureConsumptionTrendsSurveyPages(Frame):
+class Adecuacion(Frame):
     """
-    Class that displays the window for the future consumption trends survey questions. 
-    When the user answers a question, the answer is written to a 
-    csv file. 
+    Class that displays questions for Fase 1
+    Adecuacion del sistema de acceso y sostenimiento
     """
-
+    adecuacion = dict()
     def __init__(self, master, controller):
         Frame.__init__(self, master)
         self.controller = controller
 
-        global future_trends_list
-
+        global actions_impacts
+        global questions
         # Create header label
-        ttk.Label(self, text="未来消费趋势", font=('Verdana', 20),
+        ttk.Label(self, text="Adecuacion del sistema de acceso y sostenimiento", font=('Verdana', 20),
                   borderwidth=2, relief="ridge").pack(padx=10, pady=10)
 
-        self.questions = ["我还有可能来看下一场比赛。", "下场比赛我会说服别人和我一起来。",
-                          "我以后的业余休闲计划会优先考虑观看职业比赛。", "我会没特定球队的队服与纪念品等。",
-                          "我会支持特定的球队。"]
+        self.questions = questions
 
-        # set index in questions list 
+        # set index in questions list
         self.index = 0
         self.length_of_list = len(self.questions)
 
-        # Set up labels and checkboxes 
+        # Set up labels and checkboxes
         self.question_label = Label(self, text="{}. {}".format(self.index + 1, self.questions[self.index]),
                                     font=('Verdana', 16))
-        self.question_label.pack(anchor='w', padx=20, pady=10)
-        Label(self, text="选择最适合您的答案。", font=('Verdana', 10)).pack(padx=50)
+        self.question_label.pack(padx=20, pady=10)
 
-        scale_text = ["不同意", "不太同意", "基本同意", "非常同意", "完全同意"]
+        Label(self, text="Impact", font=('Verdana', 10)).pack(padx=50)
 
         # Not at all, somewhat, average, agree, strongly agree
-        scale = [("1", 1), ("2", 2), ("3", 3), ("4", 4), ("5", 5)]
+        scale_text = ["Negative", "No Impact", "Positive"]
 
-        self.var = StringVar()
-        self.var.set(0)  # initialize
+        scale = [("-1", -1), ("0", 0), ("1", 1)]
 
-        # Frame to contain text 
+        self.impact = StringVar()
+        self.impact.set(0)  # initialize
+
+        # Frame to contain text
         checkbox_scale_frame = Frame(self, borderwidth=2, relief="ridge")
         checkbox_scale_frame.pack(pady=2)
 
@@ -591,9 +615,66 @@ class FutureConsumptionTrendsSurveyPages(Frame):
 
         for text, value in scale:
             b = ttk.Radiobutton(checkbox_frame, text=text,
-                                variable=self.var, value=value)
+                                variable=self.impact, value=value)
             b.pack(side='left', ipadx=17, ipady=2)
 
+        Label(self, text="Intensidad", font=('Verdana', 10)).pack(padx=50)
+
+        # Not at all, somewhat, average, agree, strongly agree
+        scale_text = ["Baja", "Media", "Alta", "Muy Alta", "Total"]
+
+        scale = [("1", 1), ("2", 2), ("4", 4), ("8", 8), ("12", 12)]
+
+        self.intensidad = StringVar()
+        self.intensidad.set(0)  # initialize
+
+        # Frame to contain text
+        checkbox_scale_frame = Frame(self, borderwidth=2, relief="ridge")
+        checkbox_scale_frame.pack(pady=2)
+
+        for text in scale_text:
+            b = ttk.Label(checkbox_scale_frame, text=text)
+            b.pack(side='left', ipadx=7, ipady=5)
+
+        # Frame to contain checkboxes
+        checkbox_frame = Frame(self, borderwidth=2, relief="ridge")
+        checkbox_frame.pack(pady=10, anchor='center')
+
+        for text, value in scale:
+            b = ttk.Radiobutton(checkbox_frame, text=text,
+                                variable=self.intensidad, value=value)
+            b.pack(side='left', ipadx=17, ipady=2)
+
+        # Set up labels and checkboxes
+        self.question_label.pack(anchor='w', padx=20, pady=10)
+        Label(self, text="Extension", font=('Verdana', 10)).pack(padx=50)
+
+        # Not at all, somewhat, average, agree, strongly agree
+        scale_text = ["Baja", "Media", "Alta", "Muy Alta", "Total"]
+
+        scale = [("1", 1), ("2", 2), ("4", 4), ("8", 8), ("12", 12)]
+
+        self.extension = StringVar()
+        self.extension.set(0)  # initialize
+
+        # Frame to contain text
+        checkbox_scale_frame = Frame(self, borderwidth=2, relief="ridge")
+        checkbox_scale_frame.pack(pady=2)
+
+        for text in scale_text:
+            b = ttk.Label(checkbox_scale_frame, text=text)
+            b.pack(side='left', ipadx=7, ipady=5)
+
+        # Frame to contain checkboxes
+        checkbox_frame = Frame(self, borderwidth=2, relief="ridge")
+        checkbox_frame.pack(pady=10, anchor='center')
+
+        for text, value in scale:
+            b = ttk.Radiobutton(checkbox_frame, text=text,
+                                variable=self.extension, value=value)
+            b.pack(side='left', ipadx=17, ipady=2)
+
+        # Create next question button
         enter_button = ttk.Button(self, text="Next Question", command=self.nextQuestion)
         enter_button.pack(ipady=5, pady=20)
 
@@ -602,299 +683,145 @@ class FutureConsumptionTrendsSurveyPages(Frame):
         When button is clicked, add user's input to a list
         and display next question.
         '''
-        answer = self.var.get()
-
-        if answer == '0':
-            dialogBox("No Value Given",
+        answer0 = self.impact.get()
+        answer1 = self.intensidad.get()
+        answer2 = self.extension.get()
+        if answer0 != '0' and answer1 == '0':
+            dialogBox("No Value Given: Intensidad",
+                      "You did not select an answer.\nPlease try again.")
+        elif answer0 != '0' and answer2 == '0':
+            dialogBox("No Value Given: Extension",
                       "You did not select an answer.\nPlease try again.")
         elif self.index == (self.length_of_list - 1):
             # get the last answer from user
-            selected_answer = self.var.get()
-
-            future_trends_list.append(selected_answer)
-
+            total_impact = 0
+            total_impact = 3*(int(self.intensidad.get())) + 2*(int(self.extension.get()))
+            total_impact = int(self.impact.get())*total_impact
+            variable = self.index
+            self.adecuacion[variable] = total_impact
+            actions_impacts[Adecuacion] = self.adecuacion
+            print(self.adecuacion)
+            print(actions_impacts)
             next_survey_text = "End of Part 3."
-            nextSurveyDialog("Next Survey", next_survey_text, lambda: self.controller.show_frame(GenderQuestion))
+            nextSurveyDialog("Next Survey", next_survey_text,
+                             lambda: self.controller.show_frame(Descapote))
         else:
             self.index = (self.index + 1) % self.length_of_list
 
             self.question_label.config(text="{}. {}".format(self.index + 1, self.questions[self.index]))
-            selected_answer = self.var.get()
+            total_impact = 0
+            total_impact = 3*(int(self.intensidad.get())) + 2*(int(self.extension.get()))
+            total_impact = int(self.impact.get())*total_impact
+            variable = self.index
+            self.adecuacion[variable] = total_impact
 
-            future_trends_list.append(selected_answer)
-
-            self.var.set(0)  # reset value for next question
+            self.impact.set(0)
+            self.extension.set(0)  # reset value for next question
+            self.intensidad.set(0)  # reset value for next question
 
             time.sleep(.2)  # delay between questions
 
 
-class GenderQuestion(Frame):
+class Descapote(Frame):
     """
-    Displays gender question from General questions.
+    Class that displays questions for Fase 1
+    Descapote y remotion capa vegetal
     """
-
+    descapote = dict()
     def __init__(self, master, controller):
         Frame.__init__(self, master)
         self.controller = controller
 
-        global general_answers_list
-
+        global actions_impacts
+        global questions
         # Create header label
-        ttk.Label(self, text="一般特性", font=('Verdana', 20),
+        ttk.Label(self, text="Descapote y remotion capa vegetal", font=('Verdana', 20),
                   borderwidth=2, relief="ridge").pack(padx=10, pady=10)
 
-        self.question = "您的性别"
+        self.questions = questions
 
-        # Set up labels and checkboxes 
-        self.question_label = Label(self, text="1. {}".format(self.question), font=('Verdana', 16))
-        self.question_label.pack(anchor='w', padx=20, pady=10)
-        Label(self, text="选择最适合您的答案。", font=('Verdana', 10)).pack(padx=50)
+        # set index in questions list
+        self.index = 0
+        self.length_of_list = len(self.questions)
 
-        choices = [("男", "男"), ("女", "女")]
+        # Set up labels and checkboxes
+        self.question_label = Label(self, text="{}. {}".format(self.index + 1, self.questions[self.index]),
+                                    font=('Verdana', 16))
+        self.question_label.pack(padx=20, pady=10)
 
-        self.var = StringVar()
-        self.var.set(0)  # initialize
+        Label(self, text="Impact", font=('Verdana', 10)).pack(padx=50)
+
+        # Not at all, somewhat, average, agree, strongly agree
+        scale_text = ["Negative", "No Impact", "Positive"]
+
+        scale = [("-1", -1), ("0", 0), ("1", 1)]
+
+        self.impact = StringVar()
+        self.impact.set(0)  # initialize
+
+        # Frame to contain text
+        checkbox_scale_frame = Frame(self, borderwidth=2, relief="ridge")
+        checkbox_scale_frame.pack(pady=2)
+
+        for text in scale_text:
+            b = ttk.Label(checkbox_scale_frame, text=text)
+            b.pack(side='left', ipadx=7, ipady=5)
 
         # Frame to contain checkboxes
         checkbox_frame = Frame(self, borderwidth=2, relief="ridge")
         checkbox_frame.pack(pady=10, anchor='center')
 
-        for text, value in choices:
+        for text, value in scale:
             b = ttk.Radiobutton(checkbox_frame, text=text,
-                                variable=self.var, value=value)
+                                variable=self.impact, value=value)
             b.pack(side='left', ipadx=17, ipady=2)
 
-        enter_button = ttk.Button(self, text="Next Question", command=self.nextQuestion)
-        enter_button.pack(ipady=5, pady=20)
+        Label(self, text="Intensidad", font=('Verdana', 10)).pack(padx=50)
 
-    def nextQuestion(self):
-        '''
-        When button is clicked, add user's input to a list
-        and display next question.
-        '''
-        answer = self.var.get()
+        # Not at all, somewhat, average, agree, strongly agree
+        scale_text = ["Baja", "Media", "Alta", "Muy Alta", "Total"]
 
-        if answer == '0':
-            dialogBox("No Value Given",
-                      "You did not select an answer.\nPlease try again.")
-        else:
-            selected_answer = self.var.get()
-            general_answers_list.append(selected_answer)
+        scale = [("1", 1), ("2", 2), ("4", 4), ("8", 8), ("12", 12)]
 
-            time.sleep(.2)  # delay between questions
+        self.intensidad = StringVar()
+        self.intensidad.set(0)  # initialize
 
-            self.controller.show_frame(MarriageQuestion)
+        # Frame to contain text
+        checkbox_scale_frame = Frame(self, borderwidth=2, relief="ridge")
+        checkbox_scale_frame.pack(pady=2)
 
-
-class MarriageQuestion(Frame):
-    """
-    Displays marriage question from General questions.
-    """
-
-    def __init__(self, master, controller):
-        Frame.__init__(self, master)
-        self.controller = controller
-
-        global general_answers_list
-
-        # Create header label
-        ttk.Label(self, text="一般特性", font=('Verdana', 20),
-                  borderwidth=2, relief="ridge").pack(padx=10, pady=10)
-
-        self.question = "结婚了吗?"
-
-        # Set up labels and checkboxes 
-        self.question_label = Label(self, text="2. {}".format(self.question), font=('Verdana', 16))
-        self.question_label.pack(anchor='w', padx=20, pady=10)
-        Label(self, text="选择最适合您的答案。", font=('Verdana', 10)).pack(padx=50)
-
-        choices = [("结婚了", "结婚了"), ("没有", "没有")]
-
-        self.var = StringVar()
-        self.var.set(0)  # initialize
+        for text in scale_text:
+            b = ttk.Label(checkbox_scale_frame, text=text)
+            b.pack(side='left', ipadx=7, ipady=5)
 
         # Frame to contain checkboxes
         checkbox_frame = Frame(self, borderwidth=2, relief="ridge")
         checkbox_frame.pack(pady=10, anchor='center')
 
-        for text, value in choices:
+        for text, value in scale:
             b = ttk.Radiobutton(checkbox_frame, text=text,
-                                variable=self.var, value=value)
+                                variable=self.intensidad, value=value)
             b.pack(side='left', ipadx=17, ipady=2)
 
-        enter_button = ttk.Button(self, text="Next Question", command=self.nextQuestion)
-        enter_button.pack(ipady=5, pady=20)
-
-    def nextQuestion(self):
-        '''
-        When button is clicked, add user's input to a list
-        and display next question.
-        '''
-        answer = self.var.get()
-
-        if answer == '0':
-            dialogBox("No Value Given",
-                      "You did not select an answer.\nPlease try again.")
-        else:
-            selected_answer = self.var.get()
-            general_answers_list.append(selected_answer)
-
-            time.sleep(.2)  # delay between questions
-
-            self.controller.show_frame(AgeQuestion)
-
-
-class AgeQuestion(Frame):
-    """
-    Displays age question from General questions.
-    """
-
-    def __init__(self, master, controller):
-        Frame.__init__(self, master)
-        self.controller = controller
-
-        global general_answers_list
-
-        # Create header label
-        ttk.Label(self, text="一般特性", font=('Verdana', 20),
-                  borderwidth=2, relief="ridge").pack(padx=10, pady=10)
-
-        self.question = "您现在多少岁? "
-
-        # Set up labels and checkboxes 
-        self.question_label = Label(self, text="3. {}".format(self.question), font=('Verdana', 16))
+        # Set up labels and checkboxes
         self.question_label.pack(anchor='w', padx=20, pady=10)
-        Label(self, text="选择最适合您的答案。", font=('Verdana', 10)).pack(padx=50)
+        Label(self, text="Extension", font=('Verdana', 10)).pack(padx=50)
 
-        choices = [("10～20", "10～20"), ("20～30", "20～30"), ("30～40", "30～40"),
-                   ("40～50", "40～50"), ("50以上", "50以上")]
+        # Not at all, somewhat, average, agree, strongly agree
+        scale_text = ["Baja", "Media", "Alta", "Muy Alta", "Total"]
 
-        self.var = StringVar()
-        self.var.set(0)  # initialize
+        scale = [("1", 1), ("2", 2), ("4", 4), ("8", 8), ("12", 12)]
 
-        # Frame to contain checkboxes
-        checkbox_frame = Frame(self, borderwidth=2, relief="ridge")
-        checkbox_frame.pack(pady=10, anchor='center')
+        self.extension = StringVar()
+        self.extension.set(0)  # initialize
 
-        for text, value in choices:
-            b = ttk.Radiobutton(checkbox_frame, text=text,
-                                variable=self.var, value=value)
-            b.pack(side='left', ipadx=12, ipady=2)
+        # Frame to contain text
+        checkbox_scale_frame = Frame(self, borderwidth=2, relief="ridge")
+        checkbox_scale_frame.pack(pady=2)
 
-        enter_button = ttk.Button(self, text="Next Question", command=self.nextQuestion)
-        enter_button.pack(ipady=5, pady=20)
-
-    def nextQuestion(self):
-        '''
-        When button is clicked, add user's input to a list
-        and display next question.
-        '''
-        answer = self.var.get()
-
-        if answer == '0':
-            dialogBox("No Value Given",
-                      "You did not select an answer.\nPlease try again.")
-        else:
-            selected_answer = self.var.get()
-            general_answers_list.append(selected_answer)
-
-            time.sleep(.2)  # delay between questions
-
-            self.controller.show_frame(WorkQuestion)
-
-
-class WorkQuestion(Frame):
-    """
-    Displays work question from General questions.
-    """
-
-    def __init__(self, master, controller):
-        Frame.__init__(self, master)
-        self.controller = controller
-
-        global general_answers_list
-
-        # Create header label
-        ttk.Label(self, text="一般特性", font=('Verdana', 20),
-                  borderwidth=2, relief="ridge").pack(padx=10, pady=10)
-
-        self.question = "您的职业是什么? "
-
-        # Set up labels and listbox 
-        self.question_label = Label(self, text="4. {}".format(self.question), font=('Verdana', 16))
-        self.question_label.pack(anchor='w', padx=20, pady=10)
-        Label(self, text="选择最适合您的答案。", font=('Verdana', 10)).pack(padx=50)
-
-        choices = ["学生", "公司员工", "公务员", "商业", "服务员", "自由职业",
-                   "家庭主妇", "专业性工作", "其它"]
-
-        self.lb_choices = Listbox(self, selectmode=BROWSE, width=20, borderwidth=3, relief="ridge")
-        self.lb_choices.pack(ipady=5, ipadx=5)
-
-        for ch in choices:
-            self.lb_choices.insert(END, ch)
-
-        self.enter_button = ttk.Button(self, text="Next Question", command=self.nextQuestion)
-        self.enter_button.pack(ipady=5, pady=20)
-
-    def nextQuestion(self):
-        '''
-        When button is clicked, add user's input to a list
-        and display next question.
-        '''
-        selection = self.lb_choices.curselection()
-
-        if len(selection) == 0:
-            dialogBox("No Value Given",
-                      "You did not select an answer.\nPlease try again.")
-        elif selection == (8,):
-            self.other_window = otherPopUpDialog(self.master, text="Other Occupation:")
-            self.enter_button["state"] = "disabled"
-            self.master.wait_window(self.other_window.top)
-            self.enter_button["state"] = "normal"
-
-            get_other = self.other_window.value
-            general_answers_list.append(get_other)
-
-            time.sleep(.2)  # delay between questions
-
-            self.controller.show_frame(EdBackgroundQuestion)
-        else:
-            get_selection = self.lb_choices.get(selection)
-            general_answers_list.append(get_selection)
-
-            time.sleep(.2)  # delay between questions
-
-            self.controller.show_frame(EdBackgroundQuestion)
-
-
-class EdBackgroundQuestion(Frame):
-    """
-    Displays education background question from General questions.
-    """
-
-    def __init__(self, master, controller):
-        Frame.__init__(self, master)
-        self.controller = controller
-
-        global general_answers_list
-
-        # Create header label
-        ttk.Label(self, text="一般特性", font=('Verdana', 20),
-                  borderwidth=2, relief="ridge").pack(padx=10, pady=10)
-
-        self.question = "您的学历 "
-
-        # Set up labels and checkboxes 
-        self.question_label = Label(self, text="5. {}".format(self.question), font=('Verdana', 16))
-        self.question_label.pack(anchor='w', padx=20, pady=10)
-        Label(self, text="选择最适合您的答案。", font=('Verdana', 10)).pack(padx=50)
-
-        scale = [("中学以下", "中学以下"), ("高中毕业", "高中毕业"), ("大学在学", "大学在学"),
-                 ("大学毕业", "大学毕业"), ("研究生以上", "研究生以上")]
-
-        self.var = StringVar()
-        self.var.set(0)  # initialize
+        for text in scale_text:
+            b = ttk.Label(checkbox_scale_frame, text=text)
+            b.pack(side='left', ipadx=7, ipady=5)
 
         # Frame to contain checkboxes
         checkbox_frame = Frame(self, borderwidth=2, relief="ridge")
@@ -902,9 +829,10 @@ class EdBackgroundQuestion(Frame):
 
         for text, value in scale:
             b = ttk.Radiobutton(checkbox_frame, text=text,
-                                variable=self.var, value=value)
-            b.pack(side='left', ipadx=10, ipady=2)
+                                variable=self.extension, value=value)
+            b.pack(side='left', ipadx=17, ipady=2)
 
+        # Create next question button
         enter_button = ttk.Button(self, text="Next Question", command=self.nextQuestion)
         enter_button.pack(ipady=5, pady=20)
 
@@ -913,101 +841,89 @@ class EdBackgroundQuestion(Frame):
         When button is clicked, add user's input to a list
         and display next question.
         '''
-        answer = self.var.get()
-
-        if answer == '0':
-            dialogBox("No Value Given",
+        answer0 = self.impact.get()
+        answer1 = self.intensidad.get()
+        answer2 = self.extension.get()
+        if answer0 != '0' and answer1 == '0':
+            dialogBox("No Value Given: Intensidad",
                       "You did not select an answer.\nPlease try again.")
+        elif answer0 != '0' and answer2 == '0':
+            dialogBox("No Value Given: Extension",
+                      "You did not select an answer.\nPlease try again.")
+        elif self.index == (self.length_of_list - 1):
+            # get the last answer from user
+            total_impact = 0
+            total_impact = 3*(int(self.intensidad.get())) + 2*(int(self.extension.get()))
+            total_impact = int(self.impact.get())*total_impact
+            variable = self.index
+            self.descapote[variable] = total_impact
+            actions_impacts[Descapote] = self.descapote
+            print(self.descapote)
+            print(actions_impacts)
+            next_survey_text = "End of Part 4."
+            nextSurveyDialog("Next Survey", next_survey_text,
+                             lambda: self.controller.show_frame(Vias_transporte))
         else:
-            selected_answer = self.var.get()
-            general_answers_list.append(selected_answer)
+            self.index = (self.index + 1) % self.length_of_list
+
+            self.question_label.config(text="{}. {}".format(self.index + 1, self.questions[self.index]))
+            total_impact = 0
+            total_impact = 3*(int(self.intensidad.get())) + 2*(int(self.extension.get()))
+            total_impact = int(self.impact.get())*total_impact
+            variable = self.index
+            self.descapote[variable] = total_impact
+
+            self.impact.set(0)
+            self.extension.set(0)  # reset value for next question
+            self.intensidad.set(0)  # reset value for next question
 
             time.sleep(.2)  # delay between questions
 
-            self.controller.show_frame(SalaryQuestion)
 
-
-class SalaryQuestion(Frame):
+class Vias_transporte(Frame):
     """
-    Displays salary question from General questions.
+    Class that displays questions for Fase 1
+    Adecuacion de vias de transporte
     """
-
+    vias_transporte = dict()
     def __init__(self, master, controller):
         Frame.__init__(self, master)
         self.controller = controller
 
-        global general_answers_list
-
+        global actions_impacts
+        global questions
         # Create header label
-        ttk.Label(self, text="一般特性", font=('Verdana', 20),
+        ttk.Label(self, text="Adecuacion de vias de transporte", font=('Verdana', 20),
                   borderwidth=2, relief="ridge").pack(padx=10, pady=10)
 
-        self.question = "每个月工资"
+        self.questions = questions
 
-        # Set up labels and listbox
-        self.question_label = Label(self, text="6. {}".format(self.question), font=('Verdana', 16))
-        self.question_label.pack(anchor='w', padx=20, pady=10)
-        Label(self, text="选择最适合您的答案。", font=('Verdana', 10)).pack(padx=50)
+        # set index in questions list
+        self.index = 0
+        self.length_of_list = len(self.questions)
 
-        choices = ["5000以下", "5000以上1万以下", "1万以上1万5000以下",
-                   "1万5000以上2万以下", "2万以上2万5000以下", "2万5000以上"]
+        # Set up labels and checkboxes
+        self.question_label = Label(self, text="{}. {}".format(self.index + 1, self.questions[self.index]),
+                                    font=('Verdana', 16))
+        self.question_label.pack(padx=20, pady=10)
 
-        self.lb_choices = Listbox(self, selectmode=BROWSE, width=20, borderwidth=3, relief="ridge")
-        self.lb_choices.pack(ipady=5, ipadx=5)
+        Label(self, text="Impact", font=('Verdana', 10)).pack(padx=50)
 
-        for ch in choices:
-            self.lb_choices.insert(END, ch)
+        # Not at all, somewhat, average, agree, strongly agree
+        scale_text = ["Negative", "No Impact", "Positive"]
 
-        enter_button = ttk.Button(self, text="Next Question", command=self.nextQuestion)
-        enter_button.pack(ipady=5, pady=20)
+        scale = [("-1", -1), ("0", 0), ("1", 1)]
 
-    def nextQuestion(self):
-        '''
-        When button is clicked, add user's input to a list
-        and display next question.
-        '''
-        selection = self.lb_choices.curselection()
+        self.impact = StringVar()
+        self.impact.set(0)  # initialize
 
-        if len(selection) == 0:
-            dialogBox("No Value Given",
-                      "You did not select an answer.\nPlease try again.")
-        else:
-            get_selection = self.lb_choices.get(selection)
-            general_answers_list.append(get_selection)
+        # Frame to contain text
+        checkbox_scale_frame = Frame(self, borderwidth=2, relief="ridge")
+        checkbox_scale_frame.pack(pady=2)
 
-            time.sleep(.2)  # delay between questions
-
-            self.controller.show_frame(RelationQuestion)
-
-
-class RelationQuestion(Frame):
-    """
-    Displays relationship with people attending question from General questions.
-    """
-
-    def __init__(self, master, controller):
-        Frame.__init__(self, master)
-        self.controller = controller
-
-        global general_answers_list
-
-        # Create header label
-        ttk.Label(self, text="一般特性", font=('Verdana', 20),
-                  borderwidth=2, relief="ridge").pack(padx=10, pady=10)
-
-        self.question = "今天和您一起来赛场的人是什么关系呢? "
-
-        # Set up labels and checkboxes 
-        self.question_label = Label(self, text="7. {}".format(self.question), font=('Verdana', 16))
-        self.question_label.pack(anchor='w', padx=20, pady=10)
-        Label(self, text="选择最适合您的答案。", font=('Verdana', 10)).pack(padx=50)
-
-        scale = [("家人", "家人"), ("朋友", "朋友"), ("男女朋友", "男女朋友"),
-                 ("同事", "同事"), ("师兄弟（师姐妹）", "师兄弟（师姐妹）"),
-                 ("其它", "其它")]
-
-        self.var = StringVar()
-        self.var.set(0)  # initialize
+        for text in scale_text:
+            b = ttk.Label(checkbox_scale_frame, text=text)
+            b.pack(side='left', ipadx=7, ipady=5)
 
         # Frame to contain checkboxes
         checkbox_frame = Frame(self, borderwidth=2, relief="ridge")
@@ -1015,124 +931,26 @@ class RelationQuestion(Frame):
 
         for text, value in scale:
             b = ttk.Radiobutton(checkbox_frame, text=text,
-                                variable=self.var, value=value)
-            b.pack(side='left', ipadx=8, ipady=2)
+                                variable=self.impact, value=value)
+            b.pack(side='left', ipadx=17, ipady=2)
 
-        self.enter_button = ttk.Button(self, text="Next Question", command=self.nextQuestion)
-        self.enter_button.pack(ipady=5, pady=20)
+        Label(self, text="Intensidad", font=('Verdana', 10)).pack(padx=50)
 
-    def nextQuestion(self):
-        '''
-        When button is clicked, add user's input to a list
-        and display next question.
-        '''
-        answer = self.var.get()
+        # Not at all, somewhat, average, agree, strongly agree
+        scale_text = ["Baja", "Media", "Alta", "Muy Alta", "Total"]
 
-        if answer == '0':
-            dialogBox("No Value Given",
-                      "You did not select an answer.\nPlease try again.")
-        elif answer == '其它':
-            self.other_window = otherPopUpDialog(self.master, text="Other Relations:")
-            self.enter_button["state"] = "disabled"
-            self.master.wait_window(self.other_window.top)
-            self.enter_button["state"] = "normal"
+        scale = [("1", 1), ("2", 2), ("4", 4), ("8", 8), ("12", 12)]
 
-            get_other = self.other_window.value
-            general_answers_list.append(get_other)
+        self.intensidad = StringVar()
+        self.intensidad.set(0)  # initialize
 
-            time.sleep(.2)  # delay between questions
+        # Frame to contain text
+        checkbox_scale_frame = Frame(self, borderwidth=2, relief="ridge")
+        checkbox_scale_frame.pack(pady=2)
 
-            self.controller.show_frame(TimeQuestion)
-        else:
-            selected_answer = self.var.get()
-            general_answers_list.append(selected_answer)
-
-            time.sleep(.2)  # delay between questions
-
-            self.controller.show_frame(TimeQuestion)
-
-
-class TimeQuestion(Frame):
-    """
-    Displays how long person attended game question from General questions.
-    """
-
-    def __init__(self, master, controller):
-        Frame.__init__(self, master)
-        self.controller = controller
-
-        global general_answers_list
-
-        # Create header label
-        ttk.Label(self, text="一般特性", font=('Verdana', 20),
-                  borderwidth=2, relief="ridge").pack(padx=10, pady=10)
-
-        self.question = "你到赛场来需要多长时间?"
-
-        # Set up labels and listbox 
-        self.question_label = Label(self, text="8. {}".format(self.question), font=('Verdana', 16))
-        self.question_label.pack(anchor='w', padx=20, pady=10)
-        Label(self, text="选择最适合您的答案。", font=('Verdana', 10)).pack(padx=50)
-
-        choices = ["30分钟以下", "30以上 60以下", "60以上", "90以下",
-                   "90分钟以上", "120分钟以下", "120分钟以上"]
-
-        self.lb_choices = Listbox(self, selectmode=BROWSE, width=20, borderwidth=3, relief="ridge")
-        self.lb_choices.pack(ipady=5, ipadx=5)
-
-        for ch in choices:
-            self.lb_choices.insert(END, ch)
-
-        enter_button = ttk.Button(self, text="Next Question", command=self.nextQuestion)
-        enter_button.pack(ipady=5, pady=20)
-
-    def nextQuestion(self):
-        '''
-        When button is clicked, add user's input to a list
-        and display next question.
-        '''
-        selection = self.lb_choices.curselection()
-
-        if len(selection) == 0:
-            dialogBox("No Value Given",
-                      "You did not select an answer.\nPlease try again.")
-        else:
-            get_selection = self.lb_choices.get(selection)
-            general_answers_list.append(get_selection)
-
-            time.sleep(.2)  # delay between questions
-
-            self.controller.show_frame(TransitQuestion)
-
-
-class TransitQuestion(Frame):
-    """
-    Displays transportation question from General questions.
-    """
-
-    def __init__(self, master, controller):
-        Frame.__init__(self, master)
-        self.controller = controller
-
-        global general_answers_list
-
-        # Create header label
-        ttk.Label(self, text="一般特性", font=('Verdana', 20),
-                  borderwidth=2, relief="ridge").pack(padx=10, pady=10)
-
-        self.question = "来赛场时主要使用的交通工具是什么?"
-
-        self.question_label = Label(self, text="9. {}".format(self.question), font=('Verdana', 16))
-        self.question_label.pack(anchor='w', padx=20, pady=10)
-        Label(self, text="选择最适合您的答案。", font=('Verdana', 10)).pack(padx=50)
-
-        # Set up labels and checkboxes 
-        scale = [("开车", "开车"), ("地铁", "地铁"), ("公交车", "公交车"),
-                 ("出租车", "出租车"), ("自行车，电动车", "自行车，电动车"),
-                 ("走步", "走步")]
-
-        self.var = StringVar()
-        self.var.set(0)  # initialize
+        for text in scale_text:
+            b = ttk.Label(checkbox_scale_frame, text=text)
+            b.pack(side='left', ipadx=7, ipady=5)
 
         # Frame to contain checkboxes
         checkbox_frame = Frame(self, borderwidth=2, relief="ridge")
@@ -1140,9 +958,39 @@ class TransitQuestion(Frame):
 
         for text, value in scale:
             b = ttk.Radiobutton(checkbox_frame, text=text,
-                                variable=self.var, value=value)
-            b.pack(side='left', ipadx=7, ipady=2)
+                                variable=self.intensidad, value=value)
+            b.pack(side='left', ipadx=17, ipady=2)
 
+        # Set up labels and checkboxes
+        self.question_label.pack(anchor='w', padx=20, pady=10)
+        Label(self, text="Extension", font=('Verdana', 10)).pack(padx=50)
+
+        # Not at all, somewhat, average, agree, strongly agree
+        scale_text = ["Baja", "Media", "Alta", "Muy Alta", "Total"]
+
+        scale = [("1", 1), ("2", 2), ("4", 4), ("8", 8), ("12", 12)]
+
+        self.extension = StringVar()
+        self.extension.set(0)  # initialize
+
+        # Frame to contain text
+        checkbox_scale_frame = Frame(self, borderwidth=2, relief="ridge")
+        checkbox_scale_frame.pack(pady=2)
+
+        for text in scale_text:
+            b = ttk.Label(checkbox_scale_frame, text=text)
+            b.pack(side='left', ipadx=7, ipady=5)
+
+        # Frame to contain checkboxes
+        checkbox_frame = Frame(self, borderwidth=2, relief="ridge")
+        checkbox_frame.pack(pady=10, anchor='center')
+
+        for text, value in scale:
+            b = ttk.Radiobutton(checkbox_frame, text=text,
+                                variable=self.extension, value=value)
+            b.pack(side='left', ipadx=17, ipady=2)
+
+        # Create next question button
         enter_button = ttk.Button(self, text="Next Question", command=self.nextQuestion)
         enter_button.pack(ipady=5, pady=20)
 
@@ -1151,21 +999,1312 @@ class TransitQuestion(Frame):
         When button is clicked, add user's input to a list
         and display next question.
         '''
-        answer = self.var.get()
-
-        if answer == '0':
-            dialogBox("No Value Given",
+        answer0 = self.impact.get()
+        answer1 = self.intensidad.get()
+        answer2 = self.extension.get()
+        if answer0 != '0' and answer1 == '0':
+            dialogBox("No Value Given: Intensidad",
                       "You did not select an answer.\nPlease try again.")
+        elif answer0 != '0' and answer2 == '0':
+            dialogBox("No Value Given: Extension",
+                      "You did not select an answer.\nPlease try again.")
+        elif self.index == (self.length_of_list - 1):
+            # get the last answer from user
+            total_impact = 0
+            total_impact = 3*(int(self.intensidad.get())) + 2*(int(self.extension.get()))
+            total_impact = int(self.impact.get())*total_impact
+            variable = self.index
+            self.vias_transporte[variable] = total_impact
+            actions_impacts[Vias_transporte] = self.vias_transporte
+            print(self.vias_transporte)
+            print(actions_impacts)
+            next_survey_text = "End of Part 5."
+            nextSurveyDialog("Next Survey", next_survey_text,
+                             lambda: self.controller.show_frame(Disposicion))
         else:
-            selected_answer = self.var.get()
-            general_answers_list.append(selected_answer)
+            self.index = (self.index + 1) % self.length_of_list
+
+            self.question_label.config(text="{}. {}".format(self.index + 1, self.questions[self.index]))
+            total_impact = 0
+            total_impact = 3*(int(self.intensidad.get())) + 2*(int(self.extension.get()))
+            total_impact = int(self.impact.get())*total_impact
+            variable = self.index
+            self.vias_transporte[variable] = total_impact
+
+            self.impact.set(0)
+            self.extension.set(0)  # reset value for next question
+            self.intensidad.set(0)  # reset value for next question
 
             time.sleep(.2)  # delay between questions
 
-            self.controller.show_frame(ExpensesQuestion)
+
+class Disposicion(Frame):
+    """
+    Class that displays questions for Fase 1
+    Disposicion escombros y material removido
+    """
+    disposicion = dict()
+    def __init__(self, master, controller):
+        Frame.__init__(self, master)
+        self.controller = controller
+
+        global actions_impacts
+        global questions
+        # Create header label
+        ttk.Label(self, text="Disposicion escombros y material removido", font=('Verdana', 20),
+                  borderwidth=2, relief="ridge").pack(padx=10, pady=10)
+
+        self.questions = questions
+
+        # set index in questions list
+        self.index = 0
+        self.length_of_list = len(self.questions)
+
+        # Set up labels and checkboxes
+        self.question_label = Label(self, text="{}. {}".format(self.index + 1, self.questions[self.index]),
+                                    font=('Verdana', 16))
+        self.question_label.pack(padx=20, pady=10)
+
+        Label(self, text="Impact", font=('Verdana', 10)).pack(padx=50)
+
+        # Not at all, somewhat, average, agree, strongly agree
+        scale_text = ["Negative", "No Impact", "Positive"]
+
+        scale = [("-1", -1), ("0", 0), ("1", 1)]
+
+        self.impact = StringVar()
+        self.impact.set(0)  # initialize
+
+        # Frame to contain text
+        checkbox_scale_frame = Frame(self, borderwidth=2, relief="ridge")
+        checkbox_scale_frame.pack(pady=2)
+
+        for text in scale_text:
+            b = ttk.Label(checkbox_scale_frame, text=text)
+            b.pack(side='left', ipadx=7, ipady=5)
+
+        # Frame to contain checkboxes
+        checkbox_frame = Frame(self, borderwidth=2, relief="ridge")
+        checkbox_frame.pack(pady=10, anchor='center')
+
+        for text, value in scale:
+            b = ttk.Radiobutton(checkbox_frame, text=text,
+                                variable=self.impact, value=value)
+            b.pack(side='left', ipadx=17, ipady=2)
+
+        Label(self, text="Intensidad", font=('Verdana', 10)).pack(padx=50)
+
+        # Not at all, somewhat, average, agree, strongly agree
+        scale_text = ["Baja", "Media", "Alta", "Muy Alta", "Total"]
+
+        scale = [("1", 1), ("2", 2), ("4", 4), ("8", 8), ("12", 12)]
+
+        self.intensidad = StringVar()
+        self.intensidad.set(0)  # initialize
+
+        # Frame to contain text
+        checkbox_scale_frame = Frame(self, borderwidth=2, relief="ridge")
+        checkbox_scale_frame.pack(pady=2)
+
+        for text in scale_text:
+            b = ttk.Label(checkbox_scale_frame, text=text)
+            b.pack(side='left', ipadx=7, ipady=5)
+
+        # Frame to contain checkboxes
+        checkbox_frame = Frame(self, borderwidth=2, relief="ridge")
+        checkbox_frame.pack(pady=10, anchor='center')
+
+        for text, value in scale:
+            b = ttk.Radiobutton(checkbox_frame, text=text,
+                                variable=self.intensidad, value=value)
+            b.pack(side='left', ipadx=17, ipady=2)
+
+        # Set up labels and checkboxes
+        self.question_label.pack(anchor='w', padx=20, pady=10)
+        Label(self, text="Extension", font=('Verdana', 10)).pack(padx=50)
+
+        # Not at all, somewhat, average, agree, strongly agree
+        scale_text = ["Baja", "Media", "Alta", "Muy Alta", "Total"]
+
+        scale = [("1", 1), ("2", 2), ("4", 4), ("8", 8), ("12", 12)]
+
+        self.extension = StringVar()
+        self.extension.set(0)  # initialize
+
+        # Frame to contain text
+        checkbox_scale_frame = Frame(self, borderwidth=2, relief="ridge")
+        checkbox_scale_frame.pack(pady=2)
+
+        for text in scale_text:
+            b = ttk.Label(checkbox_scale_frame, text=text)
+            b.pack(side='left', ipadx=7, ipady=5)
+
+        # Frame to contain checkboxes
+        checkbox_frame = Frame(self, borderwidth=2, relief="ridge")
+        checkbox_frame.pack(pady=10, anchor='center')
+
+        for text, value in scale:
+            b = ttk.Radiobutton(checkbox_frame, text=text,
+                                variable=self.extension, value=value)
+            b.pack(side='left', ipadx=17, ipady=2)
+
+        # Create next question button
+        enter_button = ttk.Button(self, text="Next Question", command=self.nextQuestion)
+        enter_button.pack(ipady=5, pady=20)
+
+    def nextQuestion(self):
+        '''
+        When button is clicked, add user's input to a list
+        and display next question.
+        '''
+        answer0 = self.impact.get()
+        answer1 = self.intensidad.get()
+        answer2 = self.extension.get()
+        if answer0 != '0' and answer1 == '0':
+            dialogBox("No Value Given: Intensidad",
+                      "You did not select an answer.\nPlease try again.")
+        elif answer0 != '0' and answer2 == '0':
+            dialogBox("No Value Given: Extension",
+                      "You did not select an answer.\nPlease try again.")
+        elif self.index == (self.length_of_list - 1):
+            # get the last answer from user
+            total_impact = 0
+            total_impact = 3*(int(self.intensidad.get())) + 2*(int(self.extension.get()))
+            total_impact = int(self.impact.get())*total_impact
+            variable = self.index
+            self.disposicion[variable] = total_impact
+            actions_impacts[Disposicion] = self.disposicion
+            print(self.disposicion)
+            print(actions_impacts)
+            next_survey_text = "End of Part 6."
+            nextSurveyDialog("Next Survey", next_survey_text,
+                             lambda: self.controller.show_frame(Arranque))
+        else:
+            self.index = (self.index + 1) % self.length_of_list
+
+            self.question_label.config(text="{}. {}".format(self.index + 1, self.questions[self.index]))
+            total_impact = 0
+            total_impact = 3*(int(self.intensidad.get())) + 2*(int(self.extension.get()))
+            total_impact = int(self.impact.get())*total_impact
+            variable = self.index
+            self.disposicion[variable] = total_impact
+
+            self.impact.set(0)
+            self.extension.set(0)  # reset value for next question
+            self.intensidad.set(0)  # reset value for next question
+
+            time.sleep(.2)  # delay between questions
 
 
-class ExpensesQuestion(Frame):
+class Arranque(Frame):
+    """
+    Class that displays questions for Fase 1
+    Arranque y extracción
+    """
+    arranque = dict()
+
+    def __init__(self, master, controller):
+        Frame.__init__(self, master)
+        self.controller = controller
+
+        global actions_impacts
+        global questions
+        # Create header label
+        ttk.Label(self, text="Arranque y extracción", font=('Verdana', 20),
+                  borderwidth=2, relief="ridge").pack(padx=10, pady=10)
+
+        self.questions = questions
+
+        # set index in questions list
+        self.index = 0
+        self.length_of_list = len(self.questions)
+
+        # Set up labels and checkboxes
+        self.question_label = Label(self, text="{}. {}".format(self.index + 1, self.questions[self.index]),
+                                    font=('Verdana', 16))
+        self.question_label.pack(padx=20, pady=10)
+
+        Label(self, text="Impact", font=('Verdana', 10)).pack(padx=50)
+
+        # Not at all, somewhat, average, agree, strongly agree
+        scale_text = ["Negative", "No Impact", "Positive"]
+
+        scale = [("-1", -1), ("0", 0), ("1", 1)]
+
+        self.impact = StringVar()
+        self.impact.set(0)  # initialize
+
+        # Frame to contain text
+        checkbox_scale_frame = Frame(self, borderwidth=2, relief="ridge")
+        checkbox_scale_frame.pack(pady=2)
+
+        for text in scale_text:
+            b = ttk.Label(checkbox_scale_frame, text=text)
+            b.pack(side='left', ipadx=7, ipady=5)
+
+        # Frame to contain checkboxes
+        checkbox_frame = Frame(self, borderwidth=2, relief="ridge")
+        checkbox_frame.pack(pady=10, anchor='center')
+
+        for text, value in scale:
+            b = ttk.Radiobutton(checkbox_frame, text=text,
+                                variable=self.impact, value=value)
+            b.pack(side='left', ipadx=17, ipady=2)
+
+        Label(self, text="Intensidad", font=('Verdana', 10)).pack(padx=50)
+
+        # Not at all, somewhat, average, agree, strongly agree
+        scale_text = ["Baja", "Media", "Alta", "Muy Alta", "Total"]
+
+        scale = [("1", 1), ("2", 2), ("4", 4), ("8", 8), ("12", 12)]
+
+        self.intensidad = StringVar()
+        self.intensidad.set(0)  # initialize
+
+        # Frame to contain text
+        checkbox_scale_frame = Frame(self, borderwidth=2, relief="ridge")
+        checkbox_scale_frame.pack(pady=2)
+
+        for text in scale_text:
+            b = ttk.Label(checkbox_scale_frame, text=text)
+            b.pack(side='left', ipadx=7, ipady=5)
+
+        # Frame to contain checkboxes
+        checkbox_frame = Frame(self, borderwidth=2, relief="ridge")
+        checkbox_frame.pack(pady=10, anchor='center')
+
+        for text, value in scale:
+            b = ttk.Radiobutton(checkbox_frame, text=text,
+                                variable=self.intensidad, value=value)
+            b.pack(side='left', ipadx=17, ipady=2)
+
+        # Set up labels and checkboxes
+        self.question_label.pack(anchor='w', padx=20, pady=10)
+        Label(self, text="Extension", font=('Verdana', 10)).pack(padx=50)
+
+        # Not at all, somewhat, average, agree, strongly agree
+        scale_text = ["Baja", "Media", "Alta", "Muy Alta", "Total"]
+
+        scale = [("1", 1), ("2", 2), ("4", 4), ("8", 8), ("12", 12)]
+
+        self.extension = StringVar()
+        self.extension.set(0)  # initialize
+
+        # Frame to contain text
+        checkbox_scale_frame = Frame(self, borderwidth=2, relief="ridge")
+        checkbox_scale_frame.pack(pady=2)
+
+        for text in scale_text:
+            b = ttk.Label(checkbox_scale_frame, text=text)
+            b.pack(side='left', ipadx=7, ipady=5)
+
+        # Frame to contain checkboxes
+        checkbox_frame = Frame(self, borderwidth=2, relief="ridge")
+        checkbox_frame.pack(pady=10, anchor='center')
+
+        for text, value in scale:
+            b = ttk.Radiobutton(checkbox_frame, text=text,
+                                variable=self.extension, value=value)
+            b.pack(side='left', ipadx=17, ipady=2)
+
+        # Create next question button
+        enter_button = ttk.Button(self, text="Next Question", command=self.nextQuestion)
+        enter_button.pack(ipady=5, pady=20)
+
+    def nextQuestion(self):
+        '''
+        When button is clicked, add user's input to a list
+        and display next question.
+        '''
+        answer0 = self.impact.get()
+        answer1 = self.intensidad.get()
+        answer2 = self.extension.get()
+        if answer0 != '0' and answer1 == '0':
+            dialogBox("No Value Given: Intensidad",
+                      "You did not select an answer.\nPlease try again.")
+        elif answer0 != '0' and answer2 == '0':
+            dialogBox("No Value Given: Extension",
+                      "You did not select an answer.\nPlease try again.")
+        elif self.index == (self.length_of_list - 1):
+            # get the last answer from user
+            total_impact = 0
+            total_impact = 3 * (int(self.intensidad.get())) + 2 * (int(self.extension.get()))
+            total_impact = int(self.impact.get()) * total_impact
+            variable = self.index
+            self.arranque[variable] = total_impact
+            actions_impacts[Arranque] = self.arranque
+            print(self.arranque)
+            print(actions_impacts)
+            next_survey_text = "End of Part 7."
+            nextSurveyDialog("Next Survey", next_survey_text,
+                             lambda: self.controller.show_frame(Cargue))
+        else:
+            self.index = (self.index + 1) % self.length_of_list
+
+            self.question_label.config(text="{}. {}".format(self.index + 1, self.questions[self.index]))
+            total_impact = 0
+            total_impact = 3 * (int(self.intensidad.get())) + 2 * (int(self.extension.get()))
+            total_impact = int(self.impact.get()) * total_impact
+            variable = self.index
+            self.arranque[variable] = total_impact
+
+            self.impact.set(0)
+            self.extension.set(0)  # reset value for next question
+            self.intensidad.set(0)  # reset value for next question
+
+            time.sleep(.2)  # delay between questions
+
+
+class Cargue(Frame):
+    """
+    Class that displays questions for Fase 1
+    Cargue y transporte
+    """
+    cargue = dict()
+    def __init__(self, master, controller):
+        Frame.__init__(self, master)
+        self.controller = controller
+
+        global actions_impacts
+        global questions
+        # Create header label
+        ttk.Label(self, text="Cargue y transporte", font=('Verdana', 20),
+                  borderwidth=2, relief="ridge").pack(padx=10, pady=10)
+
+        self.questions = questions
+
+        # set index in questions list
+        self.index = 0
+        self.length_of_list = len(self.questions)
+
+        # Set up labels and checkboxes
+        self.question_label = Label(self, text="{}. {}".format(self.index + 1, self.questions[self.index]),
+                                    font=('Verdana', 16))
+        self.question_label.pack(padx=20, pady=10)
+
+        Label(self, text="Impact", font=('Verdana', 10)).pack(padx=50)
+
+        # Not at all, somewhat, average, agree, strongly agree
+        scale_text = ["Negative", "No Impact", "Positive"]
+
+        scale = [("-1", -1), ("0", 0), ("1", 1)]
+
+        self.impact = StringVar()
+        self.impact.set(0)  # initialize
+
+        # Frame to contain text
+        checkbox_scale_frame = Frame(self, borderwidth=2, relief="ridge")
+        checkbox_scale_frame.pack(pady=2)
+
+        for text in scale_text:
+            b = ttk.Label(checkbox_scale_frame, text=text)
+            b.pack(side='left', ipadx=7, ipady=5)
+
+        # Frame to contain checkboxes
+        checkbox_frame = Frame(self, borderwidth=2, relief="ridge")
+        checkbox_frame.pack(pady=10, anchor='center')
+
+        for text, value in scale:
+            b = ttk.Radiobutton(checkbox_frame, text=text,
+                                variable=self.impact, value=value)
+            b.pack(side='left', ipadx=17, ipady=2)
+
+        Label(self, text="Intensidad", font=('Verdana', 10)).pack(padx=50)
+
+        # Not at all, somewhat, average, agree, strongly agree
+        scale_text = ["Baja", "Media", "Alta", "Muy Alta", "Total"]
+
+        scale = [("1", 1), ("2", 2), ("4", 4), ("8", 8), ("12", 12)]
+
+        self.intensidad = StringVar()
+        self.intensidad.set(0)  # initialize
+
+        # Frame to contain text
+        checkbox_scale_frame = Frame(self, borderwidth=2, relief="ridge")
+        checkbox_scale_frame.pack(pady=2)
+
+        for text in scale_text:
+            b = ttk.Label(checkbox_scale_frame, text=text)
+            b.pack(side='left', ipadx=7, ipady=5)
+
+        # Frame to contain checkboxes
+        checkbox_frame = Frame(self, borderwidth=2, relief="ridge")
+        checkbox_frame.pack(pady=10, anchor='center')
+
+        for text, value in scale:
+            b = ttk.Radiobutton(checkbox_frame, text=text,
+                                variable=self.intensidad, value=value)
+            b.pack(side='left', ipadx=17, ipady=2)
+
+        # Set up labels and checkboxes
+        self.question_label.pack(anchor='w', padx=20, pady=10)
+        Label(self, text="Extension", font=('Verdana', 10)).pack(padx=50)
+
+        # Not at all, somewhat, average, agree, strongly agree
+        scale_text = ["Baja", "Media", "Alta", "Muy Alta", "Total"]
+
+        scale = [("1", 1), ("2", 2), ("4", 4), ("8", 8), ("12", 12)]
+
+        self.extension = StringVar()
+        self.extension.set(0)  # initialize
+
+        # Frame to contain text
+        checkbox_scale_frame = Frame(self, borderwidth=2, relief="ridge")
+        checkbox_scale_frame.pack(pady=2)
+
+        for text in scale_text:
+            b = ttk.Label(checkbox_scale_frame, text=text)
+            b.pack(side='left', ipadx=7, ipady=5)
+
+        # Frame to contain checkboxes
+        checkbox_frame = Frame(self, borderwidth=2, relief="ridge")
+        checkbox_frame.pack(pady=10, anchor='center')
+
+        for text, value in scale:
+            b = ttk.Radiobutton(checkbox_frame, text=text,
+                                variable=self.extension, value=value)
+            b.pack(side='left', ipadx=17, ipady=2)
+
+        # Create next question button
+        enter_button = ttk.Button(self, text="Next Question", command=self.nextQuestion)
+        enter_button.pack(ipady=5, pady=20)
+
+    def nextQuestion(self):
+        '''
+        When button is clicked, add user's input to a list
+        and display next question.
+        '''
+        answer0 = self.impact.get()
+        answer1 = self.intensidad.get()
+        answer2 = self.extension.get()
+        if answer0 != '0' and answer1 == '0':
+            dialogBox("No Value Given: Intensidad",
+                      "You did not select an answer.\nPlease try again.")
+        elif answer0 != '0' and answer2 == '0':
+            dialogBox("No Value Given: Extension",
+                      "You did not select an answer.\nPlease try again.")
+        elif self.index == (self.length_of_list - 1):
+            # get the last answer from user
+            total_impact = 0
+            total_impact = 3*(int(self.intensidad.get())) + 2*(int(self.extension.get()))
+            total_impact = int(self.impact.get())*total_impact
+            variable = self.index
+            self.cargue[variable] = total_impact
+            actions_impacts[Cargue] = self.cargue
+            print(self.cargue)
+            print(actions_impacts)
+            next_survey_text = "End of Part 8."
+            nextSurveyDialog("Next Survey", next_survey_text,
+                             lambda: self.controller.show_frame(Ventilacion))
+        else:
+            self.index = (self.index + 1) % self.length_of_list
+
+            self.question_label.config(text="{}. {}".format(self.index + 1, self.questions[self.index]))
+            total_impact = 0
+            total_impact = 3*(int(self.intensidad.get())) + 2*(int(self.extension.get()))
+            total_impact = int(self.impact.get())*total_impact
+            variable = self.index
+            self.cargue[variable] = total_impact
+
+            self.impact.set(0)
+            self.extension.set(0)  # reset value for next question
+            self.intensidad.set(0)  # reset value for next question
+
+            time.sleep(.2)  # delay between questions
+
+
+class Ventilacion(Frame):
+    """
+    Class that displays questions for Fase 1
+    Ventilacion
+    """
+    ventilacion = dict()
+    def __init__(self, master, controller):
+        Frame.__init__(self, master)
+        self.controller = controller
+
+        global actions_impacts
+        global questions
+        # Create header label
+        ttk.Label(self, text="Ventilacion ", font=('Verdana', 20),
+                  borderwidth=2, relief="ridge").pack(padx=10, pady=10)
+
+        self.questions = questions
+
+        # set index in questions list
+        self.index = 0
+        self.length_of_list = len(self.questions)
+
+        # Set up labels and checkboxes
+        self.question_label = Label(self, text="{}. {}".format(self.index + 1, self.questions[self.index]),
+                                    font=('Verdana', 16))
+        self.question_label.pack(padx=20, pady=10)
+
+        Label(self, text="Impact", font=('Verdana', 10)).pack(padx=50)
+
+        # Not at all, somewhat, average, agree, strongly agree
+        scale_text = ["Negative", "No Impact", "Positive"]
+
+        scale = [("-1", -1), ("0", 0), ("1", 1)]
+
+        self.impact = StringVar()
+        self.impact.set(0)  # initialize
+
+        # Frame to contain text
+        checkbox_scale_frame = Frame(self, borderwidth=2, relief="ridge")
+        checkbox_scale_frame.pack(pady=2)
+
+        for text in scale_text:
+            b = ttk.Label(checkbox_scale_frame, text=text)
+            b.pack(side='left', ipadx=7, ipady=5)
+
+        # Frame to contain checkboxes
+        checkbox_frame = Frame(self, borderwidth=2, relief="ridge")
+        checkbox_frame.pack(pady=10, anchor='center')
+
+        for text, value in scale:
+            b = ttk.Radiobutton(checkbox_frame, text=text,
+                                variable=self.impact, value=value)
+            b.pack(side='left', ipadx=17, ipady=2)
+
+        Label(self, text="Intensidad", font=('Verdana', 10)).pack(padx=50)
+
+        # Not at all, somewhat, average, agree, strongly agree
+        scale_text = ["Baja", "Media", "Alta", "Muy Alta", "Total"]
+
+        scale = [("1", 1), ("2", 2), ("4", 4), ("8", 8), ("12", 12)]
+
+        self.intensidad = StringVar()
+        self.intensidad.set(0)  # initialize
+
+        # Frame to contain text
+        checkbox_scale_frame = Frame(self, borderwidth=2, relief="ridge")
+        checkbox_scale_frame.pack(pady=2)
+
+        for text in scale_text:
+            b = ttk.Label(checkbox_scale_frame, text=text)
+            b.pack(side='left', ipadx=7, ipady=5)
+
+        # Frame to contain checkboxes
+        checkbox_frame = Frame(self, borderwidth=2, relief="ridge")
+        checkbox_frame.pack(pady=10, anchor='center')
+
+        for text, value in scale:
+            b = ttk.Radiobutton(checkbox_frame, text=text,
+                                variable=self.intensidad, value=value)
+            b.pack(side='left', ipadx=17, ipady=2)
+
+        # Set up labels and checkboxes
+        self.question_label.pack(anchor='w', padx=20, pady=10)
+        Label(self, text="Extension", font=('Verdana', 10)).pack(padx=50)
+
+        # Not at all, somewhat, average, agree, strongly agree
+        scale_text = ["Baja", "Media", "Alta", "Muy Alta", "Total"]
+
+        scale = [("1", 1), ("2", 2), ("4", 4), ("8", 8), ("12", 12)]
+
+        self.extension = StringVar()
+        self.extension.set(0)  # initialize
+
+        # Frame to contain text
+        checkbox_scale_frame = Frame(self, borderwidth=2, relief="ridge")
+        checkbox_scale_frame.pack(pady=2)
+
+        for text in scale_text:
+            b = ttk.Label(checkbox_scale_frame, text=text)
+            b.pack(side='left', ipadx=7, ipady=5)
+
+        # Frame to contain checkboxes
+        checkbox_frame = Frame(self, borderwidth=2, relief="ridge")
+        checkbox_frame.pack(pady=10, anchor='center')
+
+        for text, value in scale:
+            b = ttk.Radiobutton(checkbox_frame, text=text,
+                                variable=self.extension, value=value)
+            b.pack(side='left', ipadx=17, ipady=2)
+
+        # Create next question button
+        enter_button = ttk.Button(self, text="Next Question", command=self.nextQuestion)
+        enter_button.pack(ipady=5, pady=20)
+
+    def nextQuestion(self):
+        '''
+        When button is clicked, add user's input to a list
+        and display next question.
+        '''
+        answer0 = self.impact.get()
+        answer1 = self.intensidad.get()
+        answer2 = self.extension.get()
+        if answer0 != '0' and answer1 == '0':
+            dialogBox("No Value Given: Intensidad",
+                      "You did not select an answer.\nPlease try again.")
+        elif answer0 != '0' and answer2 == '0':
+            dialogBox("No Value Given: Extension",
+                      "You did not select an answer.\nPlease try again.")
+        elif self.index == (self.length_of_list - 1):
+            # get the last answer from user
+            total_impact = 0
+            total_impact = 3*(int(self.intensidad.get())) + 2*(int(self.extension.get()))
+            total_impact = int(self.impact.get())*total_impact
+            variable = self.index
+            self.ventilacion[variable] = total_impact
+            actions_impacts[Ventilacion] = self.ventilacion
+            print(self.ventilacion)
+            print(actions_impacts)
+            next_survey_text = "End of Part 9."
+            nextSurveyDialog("Next Survey", next_survey_text,
+                             lambda: self.controller.show_frame(Drenajes))
+        else:
+            self.index = (self.index + 1) % self.length_of_list
+
+            self.question_label.config(text="{}. {}".format(self.index + 1, self.questions[self.index]))
+            total_impact = 0
+            total_impact = 3*(int(self.intensidad.get())) + 2*(int(self.extension.get()))
+            total_impact = int(self.impact.get())*total_impact
+            variable = self.index
+            self.ventilacion[variable] = total_impact
+
+            self.impact.set(0)
+            self.extension.set(0)  # reset value for next question
+            self.intensidad.set(0)  # reset value for next question
+
+            time.sleep(.2)  # delay between questions
+
+
+class Drenajes(Frame):
+    """
+    Class that displays questions for Fase 1
+    Drenajes y manejo de aguas
+    """
+    drenajes = dict()
+    def __init__(self, master, controller):
+        Frame.__init__(self, master)
+        self.controller = controller
+
+        global actions_impacts
+        global questions
+        # Create header label
+        ttk.Label(self, text="Drenajes y manejo de aguas", font=('Verdana', 20),
+                  borderwidth=2, relief="ridge").pack(padx=10, pady=10)
+
+        self.questions = questions
+
+        # set index in questions list
+        self.index = 0
+        self.length_of_list = len(self.questions)
+
+        # Set up labels and checkboxes
+        self.question_label = Label(self, text="{}. {}".format(self.index + 1, self.questions[self.index]),
+                                    font=('Verdana', 16))
+        self.question_label.pack(padx=20, pady=10)
+
+        Label(self, text="Impact", font=('Verdana', 10)).pack(padx=50)
+
+        # Not at all, somewhat, average, agree, strongly agree
+        scale_text = ["Negative", "No Impact", "Positive"]
+
+        scale = [("-1", -1), ("0", 0), ("1", 1)]
+
+        self.impact = StringVar()
+        self.impact.set(0)  # initialize
+
+        # Frame to contain text
+        checkbox_scale_frame = Frame(self, borderwidth=2, relief="ridge")
+        checkbox_scale_frame.pack(pady=2)
+
+        for text in scale_text:
+            b = ttk.Label(checkbox_scale_frame, text=text)
+            b.pack(side='left', ipadx=7, ipady=5)
+
+        # Frame to contain checkboxes
+        checkbox_frame = Frame(self, borderwidth=2, relief="ridge")
+        checkbox_frame.pack(pady=10, anchor='center')
+
+        for text, value in scale:
+            b = ttk.Radiobutton(checkbox_frame, text=text,
+                                variable=self.impact, value=value)
+            b.pack(side='left', ipadx=17, ipady=2)
+
+        Label(self, text="Intensidad", font=('Verdana', 10)).pack(padx=50)
+
+        # Not at all, somewhat, average, agree, strongly agree
+        scale_text = ["Baja", "Media", "Alta", "Muy Alta", "Total"]
+
+        scale = [("1", 1), ("2", 2), ("4", 4), ("8", 8), ("12", 12)]
+
+        self.intensidad = StringVar()
+        self.intensidad.set(0)  # initialize
+
+        # Frame to contain text
+        checkbox_scale_frame = Frame(self, borderwidth=2, relief="ridge")
+        checkbox_scale_frame.pack(pady=2)
+
+        for text in scale_text:
+            b = ttk.Label(checkbox_scale_frame, text=text)
+            b.pack(side='left', ipadx=7, ipady=5)
+
+        # Frame to contain checkboxes
+        checkbox_frame = Frame(self, borderwidth=2, relief="ridge")
+        checkbox_frame.pack(pady=10, anchor='center')
+
+        for text, value in scale:
+            b = ttk.Radiobutton(checkbox_frame, text=text,
+                                variable=self.intensidad, value=value)
+            b.pack(side='left', ipadx=17, ipady=2)
+
+        # Set up labels and checkboxes
+        self.question_label.pack(anchor='w', padx=20, pady=10)
+        Label(self, text="Extension", font=('Verdana', 10)).pack(padx=50)
+
+        # Not at all, somewhat, average, agree, strongly agree
+        scale_text = ["Baja", "Media", "Alta", "Muy Alta", "Total"]
+
+        scale = [("1", 1), ("2", 2), ("4", 4), ("8", 8), ("12", 12)]
+
+        self.extension = StringVar()
+        self.extension.set(0)  # initialize
+
+        # Frame to contain text
+        checkbox_scale_frame = Frame(self, borderwidth=2, relief="ridge")
+        checkbox_scale_frame.pack(pady=2)
+
+        for text in scale_text:
+            b = ttk.Label(checkbox_scale_frame, text=text)
+            b.pack(side='left', ipadx=7, ipady=5)
+
+        # Frame to contain checkboxes
+        checkbox_frame = Frame(self, borderwidth=2, relief="ridge")
+        checkbox_frame.pack(pady=10, anchor='center')
+
+        for text, value in scale:
+            b = ttk.Radiobutton(checkbox_frame, text=text,
+                                variable=self.extension, value=value)
+            b.pack(side='left', ipadx=17, ipady=2)
+
+        # Create next question button
+        enter_button = ttk.Button(self, text="Next Question", command=self.nextQuestion)
+        enter_button.pack(ipady=5, pady=20)
+
+    def nextQuestion(self):
+        '''
+        When button is clicked, add user's input to a list
+        and display next question.
+        '''
+        answer0 = self.impact.get()
+        answer1 = self.intensidad.get()
+        answer2 = self.extension.get()
+        if answer0 != '0' and answer1 == '0':
+            dialogBox("No Value Given: Intensidad",
+                      "You did not select an answer.\nPlease try again.")
+        elif answer0 != '0' and answer2 == '0':
+            dialogBox("No Value Given: Extension",
+                      "You did not select an answer.\nPlease try again.")
+        elif self.index == (self.length_of_list - 1):
+            # get the last answer from user
+            total_impact = 0
+            total_impact = 3*(int(self.intensidad.get())) + 2*(int(self.extension.get()))
+            total_impact = int(self.impact.get())*total_impact
+            variable = self.index
+            self.drenajes[variable] = total_impact
+            actions_impacts[Drenajes] = self.drenajes
+            print(self.drenajes)
+            print(actions_impacts)
+            next_survey_text = "End of Part 10."
+            nextSurveyDialog("Next Survey", next_survey_text,
+                             lambda: self.controller.show_frame(Esteriles_escombros))
+        else:
+            self.index = (self.index + 1) % self.length_of_list
+
+            self.question_label.config(text="{}. {}".format(self.index + 1, self.questions[self.index]))
+            total_impact = 0
+            total_impact = 3*(int(self.intensidad.get())) + 2*(int(self.extension.get()))
+            total_impact = int(self.impact.get())*total_impact
+            variable = self.index
+            self.drenajes[variable] = total_impact
+
+            self.impact.set(0)
+            self.extension.set(0)  # reset value for next question
+            self.intensidad.set(0)  # reset value for next question
+
+            time.sleep(.2)  # delay between questions
+
+
+class Esteriles_escombros(Frame):
+    """
+    Class that displays questions for Fase 1
+    Disposicion de estériles y escombros
+    """
+    esteriles_escombros = dict()
+    def __init__(self, master, controller):
+        Frame.__init__(self, master)
+        self.controller = controller
+
+        global actions_impacts
+        global questions
+        # Create header label
+        ttk.Label(self, text="Disposicion de estériles y escombros", font=('Verdana', 20),
+                  borderwidth=2, relief="ridge").pack(padx=10, pady=10)
+
+        self.questions = questions
+
+        # set index in questions list
+        self.index = 0
+        self.length_of_list = len(self.questions)
+
+        # Set up labels and checkboxes
+        self.question_label = Label(self, text="{}. {}".format(self.index + 1, self.questions[self.index]),
+                                    font=('Verdana', 16))
+        self.question_label.pack(padx=20, pady=10)
+
+        Label(self, text="Impact", font=('Verdana', 10)).pack(padx=50)
+
+        # Not at all, somewhat, average, agree, strongly agree
+        scale_text = ["Negative", "No Impact", "Positive"]
+
+        scale = [("-1", -1), ("0", 0), ("1", 1)]
+
+        self.impact = StringVar()
+        self.impact.set(0)  # initialize
+
+        # Frame to contain text
+        checkbox_scale_frame = Frame(self, borderwidth=2, relief="ridge")
+        checkbox_scale_frame.pack(pady=2)
+
+        for text in scale_text:
+            b = ttk.Label(checkbox_scale_frame, text=text)
+            b.pack(side='left', ipadx=7, ipady=5)
+
+        # Frame to contain checkboxes
+        checkbox_frame = Frame(self, borderwidth=2, relief="ridge")
+        checkbox_frame.pack(pady=10, anchor='center')
+
+        for text, value in scale:
+            b = ttk.Radiobutton(checkbox_frame, text=text,
+                                variable=self.impact, value=value)
+            b.pack(side='left', ipadx=17, ipady=2)
+
+        Label(self, text="Intensidad", font=('Verdana', 10)).pack(padx=50)
+
+        # Not at all, somewhat, average, agree, strongly agree
+        scale_text = ["Baja", "Media", "Alta", "Muy Alta", "Total"]
+
+        scale = [("1", 1), ("2", 2), ("4", 4), ("8", 8), ("12", 12)]
+
+        self.intensidad = StringVar()
+        self.intensidad.set(0)  # initialize
+
+        # Frame to contain text
+        checkbox_scale_frame = Frame(self, borderwidth=2, relief="ridge")
+        checkbox_scale_frame.pack(pady=2)
+
+        for text in scale_text:
+            b = ttk.Label(checkbox_scale_frame, text=text)
+            b.pack(side='left', ipadx=7, ipady=5)
+
+        # Frame to contain checkboxes
+        checkbox_frame = Frame(self, borderwidth=2, relief="ridge")
+        checkbox_frame.pack(pady=10, anchor='center')
+
+        for text, value in scale:
+            b = ttk.Radiobutton(checkbox_frame, text=text,
+                                variable=self.intensidad, value=value)
+            b.pack(side='left', ipadx=17, ipady=2)
+
+        # Set up labels and checkboxes
+        self.question_label.pack(anchor='w', padx=20, pady=10)
+        Label(self, text="Extension", font=('Verdana', 10)).pack(padx=50)
+
+        # Not at all, somewhat, average, agree, strongly agree
+        scale_text = ["Baja", "Media", "Alta", "Muy Alta", "Total"]
+
+        scale = [("1", 1), ("2", 2), ("4", 4), ("8", 8), ("12", 12)]
+
+        self.extension = StringVar()
+        self.extension.set(0)  # initialize
+
+        # Frame to contain text
+        checkbox_scale_frame = Frame(self, borderwidth=2, relief="ridge")
+        checkbox_scale_frame.pack(pady=2)
+
+        for text in scale_text:
+            b = ttk.Label(checkbox_scale_frame, text=text)
+            b.pack(side='left', ipadx=7, ipady=5)
+
+        # Frame to contain checkboxes
+        checkbox_frame = Frame(self, borderwidth=2, relief="ridge")
+        checkbox_frame.pack(pady=10, anchor='center')
+
+        for text, value in scale:
+            b = ttk.Radiobutton(checkbox_frame, text=text,
+                                variable=self.extension, value=value)
+            b.pack(side='left', ipadx=17, ipady=2)
+
+        # Create next question button
+        enter_button = ttk.Button(self, text="Next Question", command=self.nextQuestion)
+        enter_button.pack(ipady=5, pady=20)
+
+    def nextQuestion(self):
+        '''
+        When button is clicked, add user's input to a list
+        and display next question.
+        '''
+        answer0 = self.impact.get()
+        answer1 = self.intensidad.get()
+        answer2 = self.extension.get()
+        if answer0 != '0' and answer1 == '0':
+            dialogBox("No Value Given: Intensidad",
+                      "You did not select an answer.\nPlease try again.")
+        elif answer0 != '0' and answer2 == '0':
+            dialogBox("No Value Given: Extension",
+                      "You did not select an answer.\nPlease try again.")
+        elif self.index == (self.length_of_list - 1):
+            # get the last answer from user
+            total_impact = 0
+            total_impact = 3*(int(self.intensidad.get())) + 2*(int(self.extension.get()))
+            total_impact = int(self.impact.get())*total_impact
+            variable = self.index
+            self.esteriles_escombros[variable] = total_impact
+            actions_impacts[Esteriles_escombros] = self.esteriles_escombros
+            print(self.esteriles_escombros)
+            print(actions_impacts)
+            next_survey_text = "End of Part 11."
+            nextSurveyDialog("Next Survey", next_survey_text,
+                             lambda: self.controller.show_frame(Cierre))
+        else:
+            self.index = (self.index + 1) % self.length_of_list
+
+            self.question_label.config(text="{}. {}".format(self.index + 1, self.questions[self.index]))
+            total_impact = 0
+            total_impact = 3*(int(self.intensidad.get())) + 2*(int(self.extension.get()))
+            total_impact = int(self.impact.get())*total_impact
+            variable = self.index
+            self.esteriles_escombros[variable] = total_impact
+
+            self.impact.set(0)
+            self.extension.set(0)  # reset value for next question
+            self.intensidad.set(0)  # reset value for next question
+
+            time.sleep(.2)  # delay between questions
+
+
+class Cierre(Frame):
+    """
+    Class that displays questions for Fase 1
+    Cierre de bocaminas
+    """
+    cierre = dict()
+
+    def __init__(self, master, controller):
+        Frame.__init__(self, master)
+        self.controller = controller
+
+        global actions_impacts
+        global questions
+        # Create header label
+        ttk.Label(self, text="Cierre de bocaminas", font=('Verdana', 20),
+                  borderwidth=2, relief="ridge").pack(padx=10, pady=10)
+
+        self.questions = questions
+
+        # set index in questions list
+        self.index = 0
+        self.length_of_list = len(self.questions)
+
+        # Set up labels and checkboxes
+        self.question_label = Label(self, text="{}. {}".format(self.index + 1, self.questions[self.index]),
+                                    font=('Verdana', 16))
+        self.question_label.pack(padx=20, pady=10)
+
+        Label(self, text="Impact", font=('Verdana', 10)).pack(padx=50)
+
+        # Not at all, somewhat, average, agree, strongly agree
+        scale_text = ["Negative", "No Impact", "Positive"]
+
+        scale = [("-1", -1), ("0", 0), ("1", 1)]
+
+        self.impact = StringVar()
+        self.impact.set(0)  # initialize
+
+        # Frame to contain text
+        checkbox_scale_frame = Frame(self, borderwidth=2, relief="ridge")
+        checkbox_scale_frame.pack(pady=2)
+
+        for text in scale_text:
+            b = ttk.Label(checkbox_scale_frame, text=text)
+            b.pack(side='left', ipadx=7, ipady=5)
+
+        # Frame to contain checkboxes
+        checkbox_frame = Frame(self, borderwidth=2, relief="ridge")
+        checkbox_frame.pack(pady=10, anchor='center')
+
+        for text, value in scale:
+            b = ttk.Radiobutton(checkbox_frame, text=text,
+                                variable=self.impact, value=value)
+            b.pack(side='left', ipadx=17, ipady=2)
+
+        Label(self, text="Intensidad", font=('Verdana', 10)).pack(padx=50)
+
+        # Not at all, somewhat, average, agree, strongly agree
+        scale_text = ["Baja", "Media", "Alta", "Muy Alta", "Total"]
+
+        scale = [("1", 1), ("2", 2), ("4", 4), ("8", 8), ("12", 12)]
+
+        self.intensidad = StringVar()
+        self.intensidad.set(0)  # initialize
+
+        # Frame to contain text
+        checkbox_scale_frame = Frame(self, borderwidth=2, relief="ridge")
+        checkbox_scale_frame.pack(pady=2)
+
+        for text in scale_text:
+            b = ttk.Label(checkbox_scale_frame, text=text)
+            b.pack(side='left', ipadx=7, ipady=5)
+
+        # Frame to contain checkboxes
+        checkbox_frame = Frame(self, borderwidth=2, relief="ridge")
+        checkbox_frame.pack(pady=10, anchor='center')
+
+        for text, value in scale:
+            b = ttk.Radiobutton(checkbox_frame, text=text,
+                                variable=self.intensidad, value=value)
+            b.pack(side='left', ipadx=17, ipady=2)
+
+        # Set up labels and checkboxes
+        self.question_label.pack(anchor='w', padx=20, pady=10)
+        Label(self, text="Extension", font=('Verdana', 10)).pack(padx=50)
+
+        # Not at all, somewhat, average, agree, strongly agree
+        scale_text = ["Baja", "Media", "Alta", "Muy Alta", "Total"]
+
+        scale = [("1", 1), ("2", 2), ("4", 4), ("8", 8), ("12", 12)]
+
+        self.extension = StringVar()
+        self.extension.set(0)  # initialize
+
+        # Frame to contain text
+        checkbox_scale_frame = Frame(self, borderwidth=2, relief="ridge")
+        checkbox_scale_frame.pack(pady=2)
+
+        for text in scale_text:
+            b = ttk.Label(checkbox_scale_frame, text=text)
+            b.pack(side='left', ipadx=7, ipady=5)
+
+        # Frame to contain checkboxes
+        checkbox_frame = Frame(self, borderwidth=2, relief="ridge")
+        checkbox_frame.pack(pady=10, anchor='center')
+
+        for text, value in scale:
+            b = ttk.Radiobutton(checkbox_frame, text=text,
+                                variable=self.extension, value=value)
+            b.pack(side='left', ipadx=17, ipady=2)
+
+        # Create next question button
+        enter_button = ttk.Button(self, text="Next Question", command=self.nextQuestion)
+        enter_button.pack(ipady=5, pady=20)
+
+    def nextQuestion(self):
+        '''
+        When button is clicked, add user's input to a list
+        and display next question.
+        '''
+        answer0 = self.impact.get()
+        answer1 = self.intensidad.get()
+        answer2 = self.extension.get()
+        if answer0 != '0' and answer1 == '0':
+            dialogBox("No Value Given: Intensidad",
+                      "You did not select an answer.\nPlease try again.")
+        elif answer0 != '0' and answer2 == '0':
+            dialogBox("No Value Given: Extension",
+                      "You did not select an answer.\nPlease try again.")
+        elif self.index == (self.length_of_list - 1):
+            # get the last answer from user
+            total_impact = 0
+            total_impact = 3 * (int(self.intensidad.get())) + 2 * (int(self.extension.get()))
+            total_impact = int(self.impact.get()) * total_impact
+            variable = self.index
+            self.cierre[variable] = total_impact
+            actions_impacts[Cierre] = self.cierre
+            print(self.cierre)
+            print(actions_impacts)
+            next_survey_text = "End of Part 12."
+            nextSurveyDialog("Next Survey", next_survey_text,
+                             lambda: self.controller.show_frame(Levantamiento))
+        else:
+            self.index = (self.index + 1) % self.length_of_list
+
+            self.question_label.config(text="{}. {}".format(self.index + 1, self.questions[self.index]))
+            total_impact = 0
+            total_impact = 3 * (int(self.intensidad.get())) + 2 * (int(self.extension.get()))
+            total_impact = int(self.impact.get()) * total_impact
+            variable = self.index
+            self.cierre[variable] = total_impact
+
+            self.impact.set(0)
+            self.extension.set(0)  # reset value for next question
+            self.intensidad.set(0)  # reset value for next question
+
+            time.sleep(.2)  # delay between questions
+
+
+class Levantamiento(Frame):
+    """
+    Class that displays questions for Fase 1
+    Levantamiento infraestructura
+    """
+    levantamiento = dict()
+    def __init__(self, master, controller):
+        Frame.__init__(self, master)
+        self.controller = controller
+
+        global actions_impacts
+        global questions
+        # Create header label
+        ttk.Label(self, text="Levantamiento infraestructura", font=('Verdana', 20),
+                  borderwidth=2, relief="ridge").pack(padx=10, pady=10)
+
+        self.questions = questions
+
+        # set index in questions list
+        self.index = 0
+        self.length_of_list = len(self.questions)
+
+        # Set up labels and checkboxes
+        self.question_label = Label(self, text="{}. {}".format(self.index + 1, self.questions[self.index]),
+                                    font=('Verdana', 16))
+        self.question_label.pack(padx=20, pady=10)
+
+        Label(self, text="Impact", font=('Verdana', 10)).pack(padx=50)
+
+        # Not at all, somewhat, average, agree, strongly agree
+        scale_text = ["Negative", "No Impact", "Positive"]
+
+        scale = [("-1", -1), ("0", 0), ("1", 1)]
+
+        self.impact = StringVar()
+        self.impact.set(0)  # initialize
+
+        # Frame to contain text
+        checkbox_scale_frame = Frame(self, borderwidth=2, relief="ridge")
+        checkbox_scale_frame.pack(pady=2)
+
+        for text in scale_text:
+            b = ttk.Label(checkbox_scale_frame, text=text)
+            b.pack(side='left', ipadx=7, ipady=5)
+
+        # Frame to contain checkboxes
+        checkbox_frame = Frame(self, borderwidth=2, relief="ridge")
+        checkbox_frame.pack(pady=10, anchor='center')
+
+        for text, value in scale:
+            b = ttk.Radiobutton(checkbox_frame, text=text,
+                                variable=self.impact, value=value)
+            b.pack(side='left', ipadx=17, ipady=2)
+
+        Label(self, text="Intensidad", font=('Verdana', 10)).pack(padx=50)
+
+        # Not at all, somewhat, average, agree, strongly agree
+        scale_text = ["Baja", "Media", "Alta", "Muy Alta", "Total"]
+
+        scale = [("1", 1), ("2", 2), ("4", 4), ("8", 8), ("12", 12)]
+
+        self.intensidad = StringVar()
+        self.intensidad.set(0)  # initialize
+
+        # Frame to contain text
+        checkbox_scale_frame = Frame(self, borderwidth=2, relief="ridge")
+        checkbox_scale_frame.pack(pady=2)
+
+        for text in scale_text:
+            b = ttk.Label(checkbox_scale_frame, text=text)
+            b.pack(side='left', ipadx=7, ipady=5)
+
+        # Frame to contain checkboxes
+        checkbox_frame = Frame(self, borderwidth=2, relief="ridge")
+        checkbox_frame.pack(pady=10, anchor='center')
+
+        for text, value in scale:
+            b = ttk.Radiobutton(checkbox_frame, text=text,
+                                variable=self.intensidad, value=value)
+            b.pack(side='left', ipadx=17, ipady=2)
+
+        # Set up labels and checkboxes
+        self.question_label.pack(anchor='w', padx=20, pady=10)
+        Label(self, text="Extension", font=('Verdana', 10)).pack(padx=50)
+
+        # Not at all, somewhat, average, agree, strongly agree
+        scale_text = ["Baja", "Media", "Alta", "Muy Alta", "Total"]
+
+        scale = [("1", 1), ("2", 2), ("4", 4), ("8", 8), ("12", 12)]
+
+        self.extension = StringVar()
+        self.extension.set(0)  # initialize
+
+        # Frame to contain text
+        checkbox_scale_frame = Frame(self, borderwidth=2, relief="ridge")
+        checkbox_scale_frame.pack(pady=2)
+
+        for text in scale_text:
+            b = ttk.Label(checkbox_scale_frame, text=text)
+            b.pack(side='left', ipadx=7, ipady=5)
+
+        # Frame to contain checkboxes
+        checkbox_frame = Frame(self, borderwidth=2, relief="ridge")
+        checkbox_frame.pack(pady=10, anchor='center')
+
+        for text, value in scale:
+            b = ttk.Radiobutton(checkbox_frame, text=text,
+                                variable=self.extension, value=value)
+            b.pack(side='left', ipadx=17, ipady=2)
+
+        # Create next question button
+        enter_button = ttk.Button(self, text="Next Question", command=self.nextQuestion)
+        enter_button.pack(ipady=5, pady=20)
+
+    def nextQuestion(self):
+        '''
+        When button is clicked, add user's input to a list
+        and display next question.
+        '''
+        answer0 = self.impact.get()
+        answer1 = self.intensidad.get()
+        answer2 = self.extension.get()
+        if answer0 != '0' and answer1 == '0':
+            dialogBox("No Value Given: Intensidad",
+                      "You did not select an answer.\nPlease try again.")
+        elif answer0 != '0' and answer2 == '0':
+            dialogBox("No Value Given: Extension",
+                      "You did not select an answer.\nPlease try again.")
+        elif self.index == (self.length_of_list - 1):
+            # get the last answer from user
+            total_impact = 0
+            total_impact = 3*(int(self.intensidad.get())) + 2*(int(self.extension.get()))
+            total_impact = int(self.impact.get())*total_impact
+            variable = self.index
+            self.levantamiento[variable] = total_impact
+            actions_impacts[Levantamiento] = self.levantamiento
+            print(self.levantamiento)
+            print(actions_impacts)
+            next_survey_text = "End of Part 13."
+            nextSurveyDialog("Next Survey", next_survey_text,
+                             lambda: self.controller.show_frame(EndScreen))
+        else:
+            self.index = (self.index + 1) % self.length_of_list
+
+            self.question_label.config(text="{}. {}".format(self.index + 1, self.questions[self.index]))
+            total_impact = 0
+            total_impact = 3*(int(self.intensidad.get())) + 2*(int(self.extension.get()))
+            total_impact = int(self.impact.get())*total_impact
+            variable = self.index
+            self.levantamiento[variable] = total_impact
+
+            self.impact.set(0)
+            self.extension.set(0)  # reset value for next question
+            self.intensidad.set(0)  # reset value for next question
+
+            time.sleep(.2)  # delay between questions
+
+
+class EndScreen(Frame):
     """
     Displays expenses at game question from General questions.
     """
@@ -1177,48 +2316,27 @@ class ExpensesQuestion(Frame):
         global general_answers_list
 
         # Create header label
-        ttk.Label(self, text="一般特性", font=('Verdana', 20),
+        ttk.Label(self, text="End Screen", font=('Verdana', 20),
                   borderwidth=2, relief="ridge").pack(padx=10, pady=10)
 
-        self.question = "您今天在赛场一个人消费（门票,交通费及停车费,饮食费等）多少?"
+        self.question = "The evaluation is now finished. Click continue to write the file."
 
         # Set up labels and listbox
         self.question_label = Label(self, text="10. {}".format(self.question), font=('Verdana', 16))
         self.question_label.pack(anchor='w', padx=20, pady=10)
-        Label(self, text="选择最适合您的答案。", font=('Verdana', 10)).pack(padx=50)
 
-        choices = ["30元以下", "30元 - 60元", "60元 - 100元",
-                   "100元 - 150元", "150元 - 180元", "180元 - 200元",
-                   "200元 - 230元", "230元以上"]
 
-        self.lb_choices = Listbox(self, selectmode=BROWSE, width=20, borderwidth=3, relief="ridge")
-        self.lb_choices.pack(ipady=5, ipadx=5)
-
-        for ch in choices:
-            self.lb_choices.insert(END, ch)
-
-        enter_button = ttk.Button(self, text="Next Question", command=self.nextQuestion)
+        enter_button = ttk.Button(self, text="Continue", command=self.nextQuestion)
         enter_button.pack(ipady=5, pady=20)
 
     def nextQuestion(self):
         '''
-        When button is clicked, add user's input to a list
-        and display next question.
+        end diologue
         '''
-        selection = self.lb_choices.curselection()
 
-        if len(selection) == 0:
-            dialogBox("No Value Given",
-                      "You did not select an answer.\nPlease try again.")
-        else:
-            get_selection = self.lb_choices.get(selection)
-            general_answers_list.append(get_selection)
-
-            time.sleep(.2)  # delay between questions
-
-            self.writeToFile()
-            finished_text = "You have reached the end of the survey.\nThank you for your participation and your time.\n"
-            finishedDialog("Finished Survey", finished_text)
+        self.writeToFile()
+        finished_text = "You have reached the end of the survey.\n"
+        finishedDialog("Finished Survey", finished_text)
 
     def writeToFile(self):
         """
@@ -1226,14 +2344,13 @@ class ExpensesQuestion(Frame):
         answer list to separate files.
         """
         # list of names and answer lists
-        filenames = ['01_lifestyle_answers.csv', '02_sig_trends_answers.csv',
-                     '03_future_trends_answers.csv', '04_general_answers.csv']
+        filenames = ['answers.csv']
 
-        answers_lists = [lifestyle_list, sig_trends_list,
-                         future_trends_list, general_answers_list]
+        answers_lists = [actions_impacts]
 
         for filename, answers in zip(filenames, answers_lists):
             writeToFile(filename, answers)
+
 
 
 # Run program
