@@ -381,7 +381,7 @@ class Construccion(Frame):
             total_impact = 0
             total_impact = 3*(int(self.intensidad.get())) + 2*(int(self.extension.get()))
             total_impact = int(self.impact.get())*total_impact
-            variable = self.index
+            variable = self.index + 1
             self.construccion[variable] = total_impact
             actions_impacts[Construccion] = self.construccion
             print(self.construccion)
@@ -539,7 +539,7 @@ class Apertura(Frame):
             total_impact = 0
             total_impact = 3*(int(self.intensidad.get())) + 2*(int(self.extension.get()))
             total_impact = int(self.impact.get())*total_impact
-            variable = self.index
+            variable = self.index + 1
             self.apertura[variable] = total_impact
             actions_impacts[Apertura] = self.apertura
             print(self.apertura)
@@ -697,7 +697,7 @@ class Adecuacion(Frame):
             total_impact = 0
             total_impact = 3*(int(self.intensidad.get())) + 2*(int(self.extension.get()))
             total_impact = int(self.impact.get())*total_impact
-            variable = self.index
+            variable = self.index + 1
             self.adecuacion[variable] = total_impact
             actions_impacts[Adecuacion] = self.adecuacion
             print(self.adecuacion)
@@ -855,7 +855,7 @@ class Descapote(Frame):
             total_impact = 0
             total_impact = 3*(int(self.intensidad.get())) + 2*(int(self.extension.get()))
             total_impact = int(self.impact.get())*total_impact
-            variable = self.index
+            variable = self.index + 1
             self.descapote[variable] = total_impact
             actions_impacts[Descapote] = self.descapote
             print(self.descapote)
@@ -1013,7 +1013,7 @@ class Vias_transporte(Frame):
             total_impact = 0
             total_impact = 3*(int(self.intensidad.get())) + 2*(int(self.extension.get()))
             total_impact = int(self.impact.get())*total_impact
-            variable = self.index
+            variable = self.index + 1
             self.vias_transporte[variable] = total_impact
             actions_impacts[Vias_transporte] = self.vias_transporte
             print(self.vias_transporte)
@@ -1171,7 +1171,7 @@ class Disposicion(Frame):
             total_impact = 0
             total_impact = 3*(int(self.intensidad.get())) + 2*(int(self.extension.get()))
             total_impact = int(self.impact.get())*total_impact
-            variable = self.index
+            variable = self.index + 1
             self.disposicion[variable] = total_impact
             actions_impacts[Disposicion] = self.disposicion
             print(self.disposicion)
@@ -1330,7 +1330,7 @@ class Arranque(Frame):
             total_impact = 0
             total_impact = 3 * (int(self.intensidad.get())) + 2 * (int(self.extension.get()))
             total_impact = int(self.impact.get()) * total_impact
-            variable = self.index
+            variable = self.index + 1
             self.arranque[variable] = total_impact
             actions_impacts[Arranque] = self.arranque
             print(self.arranque)
@@ -1488,7 +1488,7 @@ class Cargue(Frame):
             total_impact = 0
             total_impact = 3*(int(self.intensidad.get())) + 2*(int(self.extension.get()))
             total_impact = int(self.impact.get())*total_impact
-            variable = self.index
+            variable = self.index + 1
             self.cargue[variable] = total_impact
             actions_impacts[Cargue] = self.cargue
             print(self.cargue)
@@ -1646,7 +1646,7 @@ class Ventilacion(Frame):
             total_impact = 0
             total_impact = 3*(int(self.intensidad.get())) + 2*(int(self.extension.get()))
             total_impact = int(self.impact.get())*total_impact
-            variable = self.index
+            variable = self.index + 1
             self.ventilacion[variable] = total_impact
             actions_impacts[Ventilacion] = self.ventilacion
             print(self.ventilacion)
@@ -1804,7 +1804,7 @@ class Drenajes(Frame):
             total_impact = 0
             total_impact = 3*(int(self.intensidad.get())) + 2*(int(self.extension.get()))
             total_impact = int(self.impact.get())*total_impact
-            variable = self.index
+            variable = self.index + 1
             self.drenajes[variable] = total_impact
             actions_impacts[Drenajes] = self.drenajes
             print(self.drenajes)
@@ -1962,7 +1962,7 @@ class Esteriles_escombros(Frame):
             total_impact = 0
             total_impact = 3*(int(self.intensidad.get())) + 2*(int(self.extension.get()))
             total_impact = int(self.impact.get())*total_impact
-            variable = self.index
+            variable = self.index + 1
             self.esteriles_escombros[variable] = total_impact
             actions_impacts[Esteriles_escombros] = self.esteriles_escombros
             print(self.esteriles_escombros)
@@ -2121,7 +2121,7 @@ class Cierre(Frame):
             total_impact = 0
             total_impact = 3 * (int(self.intensidad.get())) + 2 * (int(self.extension.get()))
             total_impact = int(self.impact.get()) * total_impact
-            variable = self.index
+            variable = self.index + 1
             self.cierre[variable] = total_impact
             actions_impacts[Cierre] = self.cierre
             print(self.cierre)
@@ -2279,7 +2279,7 @@ class Levantamiento(Frame):
             total_impact = 0
             total_impact = 3*(int(self.intensidad.get())) + 2*(int(self.extension.get()))
             total_impact = int(self.impact.get())*total_impact
-            variable = self.index
+            variable = self.index + 1
             self.levantamiento[variable] = total_impact
             actions_impacts[Levantamiento] = self.levantamiento
             print(self.levantamiento)
